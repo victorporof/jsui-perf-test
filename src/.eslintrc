@@ -1,0 +1,12 @@
+{
+  "env": {
+    "browser": true,
+    "node": false
+  },
+  "globals": {
+    "ENV": true
+  },
+  "rules": {
+    "react/prop-types": "off"
+  }
+}

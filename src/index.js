@@ -1,7 +1,9 @@
-import React from "react";
-import ReactDOM from "react-dom";
+import "./util/fps";
+import "./benchmark";
 
-import App from "./app";
+import "./util/fps.css";
+import "./index.css";
+import "./env.css";
 
-const wrapper = document.getElementById("container");
-ReactDOM.render(<App />, wrapper);
+// import "./layout-block.css";
+import "./layout-flex.css";

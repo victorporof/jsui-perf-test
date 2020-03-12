@@ -1,0 +1,25 @@
+.table {
+  --dbname-width: 27.25%;
+  --query-count-width: 10%;
+}
+
+.td {
+  display: inline-block;
+}
+
+.td {
+  width: calc((100% - var(--dbname-width) - var(--query-count-width)) / 5);
+}
+
+.td.dbname {
+  width: var(--dbname-width);
+}
+
+.td.query-count {
+  width: var(--query-count-width);
+}
+
+.label {
+  padding-top: 0.2em;
+  padding-bottom: 0.3em;
+}

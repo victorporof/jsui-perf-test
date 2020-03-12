@@ -1,0 +1,5 @@
+{
+  "search.exclude": {
+    "js-repaint-perfs": true
+  }
+}

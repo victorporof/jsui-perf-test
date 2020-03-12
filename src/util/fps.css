@@ -1,0 +1,5 @@
+body > div:last-child > canvas {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+}

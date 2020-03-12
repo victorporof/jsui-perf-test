@@ -1,0 +1,25 @@
+.dbmon * {
+  display: flex;
+}
+
+.tbody {
+  flex-direction: column;
+  flex: 1;
+}
+
+.td {
+  flex: 1;
+}
+
+.td.dbname {
+  flex: 2.2;
+}
+
+.td.query-count {
+  flex: 0.8;
+}
+
+.label {
+  align-items: center;
+  margin: 0.1em 0;
+}
