@@ -1,0 +1,3 @@
+[submodule "js-repaint-perfs"]
+	path = js-repaint-perfs
+	url = git@github.com:victorporof/js-repaint-perfs.git
