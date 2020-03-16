@@ -30,7 +30,7 @@ class Database extends Component {
 
   render() {
     return (
-      <div className="tr" key={this.props.dbname}>
+      <div className="tr">
         <div className="td dbname">{this.props.dbname}</div>
         <div className="td query-count">
           <span className={this.props.lastSample.countClassName}>
@@ -74,8 +74,8 @@ export default class DBMon extends Component {
   }
 
   render() {
-    const databases = this.state.databases.map(database => {
-      return (
+    const databases = () =>
+      this.state.databases.map(database => (
         <Database
           key={database.dbname}
           lastMutationId={database.lastMutationId}
@@ -83,14 +83,13 @@ export default class DBMon extends Component {
           samples={database.samples}
           lastSample={database.lastSample}
         />
-      );
-    });
+      ));
 
     return (
       <div className="dbmon">
         {times(1).map(i => (
           <div key={i} className="table table-striped latest-data">
-            <div className="tbody">{databases}</div>
+            <div className="tbody">{databases()}</div>
           </div>
         ))}
       </div>

@@ -1,4 +1,4 @@
-import { Fragment, Nil, Text } from "./jsui-primitive";
+import { DOMNode, Fragment, Nil, Text } from "./jsui-primitive";
 import { lockstep } from "./jsui-util";
 
 export const ELEMENT = Symbol("JsUI Element");
@@ -7,10 +7,7 @@ export class Element {
   constructor(type, props, children, meta) {
     this.type = type;
     this.props = props ?? {};
-    Object.defineProperty(this.props, "children", {
-      enumerable: false,
-      value: children?.map(Element.sanitize)
-    });
+    this.props.children = children?.map(Element.sanitize);
     this.meta = meta;
   }
 
@@ -49,7 +46,6 @@ export class Element {
 
     this.component = element.component;
     this.rendered = element.rendered;
-    this.mounted = element.mounted;
 
     this.component[ELEMENT] = this;
   }
@@ -70,23 +66,22 @@ export class Element {
     const prevRendered = this.rendered;
     const nextRendered = (this.rendered = Element.sanitize(component.render()));
 
+    nextRendered.return = this;
     nextRendered.dom = prevRendered?.dom;
 
     lockstep(prevRendered?.props.children, nextRendered.props.children, (oldChild, newChild) => {
       newChild?.persistFrom(oldChild);
       newChild?.updateTreeIn(container);
     });
-
-    if (!this.mounted) {
-      this.mounted = true;
-      requestAnimationFrame(() => {
-        component.componentDidMount();
-      });
-    }
   }
 
   receiveState(nextState) {
     this.nextState = nextState;
     this.container.flushTreeWhenPossible();
+  }
+
+  didMount(dom) {
+    this.dom = dom;
+    requestAnimationFrame(() => this.return.component.componentDidMount());
   }
 }

@@ -19,14 +19,14 @@ export const diff = (oldElement, newElement, listeners, parentElement = null) =>
       listeners.onSetText(newElement, nextTextValue);
     }
   } else {
-    lockstepObj(oldElement.props, newElement.props, (prevProp, nextProp) => {
-      const [prevName, prevValue] = prevProp;
-      const [nextName, nextValue] = nextProp;
-      if (prevName != nextName) {
-        listeners.onRemovedAtrribute(newElement, prevName);
-        listeners.onSetAttribute(newElement, nextName, nextValue);
+    lockstepObj(oldElement.props, newElement.props, (propName, prevValue, nextValue) => {
+      if (propName == "children") {
+        return;
+      }
+      if (nextValue === undefined) {
+        listeners.onRemovedAtrribute(newElement, propName);
       } else if (prevValue != nextValue) {
-        listeners.onSetAttribute(newElement, nextName, nextValue);
+        listeners.onSetAttribute(newElement, propName, nextValue);
       }
     });
   }

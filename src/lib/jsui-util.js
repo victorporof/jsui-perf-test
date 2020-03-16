@@ -19,10 +19,13 @@ export const lockstep = (iterA, iterB, cb) => {
 };
 
 export const lockstepObj = (objA, objB, cb) => {
-  const iterA = Object.entries(objA ?? {});
-  const iterB = Object.entries(objB ?? {});
-
-  for (let i = 0; i < Math.max(iterA.length, iterB.length); i++) {
-    cb(iterA[i], iterB[i]);
+  // eslint-disable-next-line guard-for-in
+  for (const key in objA) {
+    cb(key, objA[key], objB[key]);
+  }
+  for (const key in objB) {
+    if (!(key in objA)) {
+      cb(key, undefined, objB[key]);
+    }
   }
 };

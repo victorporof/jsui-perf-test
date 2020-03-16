@@ -1,4 +1,4 @@
-import { ATTRIBUTE_MAP, ATTRIBUTE_SETS } from "./jsui-attributes";
+import { getRealAttributeName, isValidAttribute } from "./jsui-attributes";
 import { diff } from "./jsui-diff";
 import { Fragment } from "./jsui-primitive";
 import { DOMPrint, DOMPrintShallow, HTMLPrint } from "./jsui-printers";
@@ -19,7 +19,7 @@ export class DiffingReconciler {
   static reconcile(oldElement, newElement, host) {
     diff(oldElement, newElement, {
       onAdded: (element, parent) => this.onAdded(element, parent, host),
-      onRemove: this.onRemove,
+      onRemoved: this.onRemoved,
       onSetText: this.onSetText,
       onSetAttribute: this.onSetAttribute,
       onRemoveAtrribute: this.onRemoveAtrribute
@@ -27,18 +27,18 @@ export class DiffingReconciler {
   }
 
   static onAdded(element, parent, host) {
-    const node = DOMPrintShallow.toDOM(element);
     const parentNode = parent?.dom ?? host;
-    parentNode.appendChild(node);
 
     if (element.type == Fragment) {
-      element.dom = parentNode;
+      element.didMount(parentNode);
     } else {
-      element.dom = parentNode.lastChild;
+      const node = DOMPrintShallow.toDOM(element);
+      parentNode.appendChild(node);
+      element.didMount(node);
     }
   }
 
-  static onRemove() {
+  static onRemoved() {
     // TODO
   }
 
@@ -47,14 +47,15 @@ export class DiffingReconciler {
   }
 
   static onSetAttribute(element, name, value) {
-    if (!ATTRIBUTE_SETS["*"].has(name) && !ATTRIBUTE_SETS[element.meta.tag].has(name)) {
+    if (!isValidAttribute(element.meta.tag, name)) {
       return;
     }
-    const key = ATTRIBUTE_MAP[name] ?? name;
+    const key = getRealAttributeName(name);
     element.dom.setAttribute(key, value);
   }
 
   static onRemovedAttribute(element, name) {
-    element.dom.removeAttribute(ATTRIBUTE_MAP[name] ?? name);
+    const key = getRealAttributeName(name);
+    element.dom.removeAttribute(key ?? name);
   }
 }

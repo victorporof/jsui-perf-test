@@ -1,14 +1,15 @@
-import { ATTRIBUTE_MAP, ATTRIBUTE_SETS } from "./jsui-attributes";
+import { getRealAttributeName, isValidAttribute } from "./jsui-attributes";
 import { DOMNode, Fragment, Text } from "./jsui-primitive";
 
 export class DOMPrintShallow {
-  static toDOM(element, host = new DocumentFragment()) {
+  static toDOM(element) {
     if (element.type == DOMNode) {
-      DOMPrint.appendNode(element, host);
-    } else if (element.type == Text) {
-      DOMPrint.appendText(element, host);
+      return DOMPrint.createNode(element);
     }
-    return host;
+    if (element.type == Text) {
+      return DOMPrint.createText(element);
+    }
+    return null;
   }
 }
 
@@ -20,7 +21,7 @@ export class DOMPrint {
     host.appendChild(this.toDOM(element));
   }
 
-  static toDOM(element, host = new DocumentFragment()) {
+  static toDOM(element, host = document.createDocumentFragment()) {
     if (element.type == DOMNode) {
       this.appendNodeDeep(element, host);
     } else if (element.type == Fragment) {
@@ -31,8 +32,12 @@ export class DOMPrint {
     return host;
   }
 
+  static createText(element) {
+    return document.createTextNode(element.meta.value);
+  }
+
   static appendText(element, host) {
-    const node = document.createTextNode(element.meta.value);
+    const node = this.createText(element);
     host.appendChild(node);
   }
 
@@ -42,21 +47,21 @@ export class DOMPrint {
     }
   }
 
-  static appendNode(element, host) {
+  static createNode(element) {
     const node = document.createElement(element.meta.tag);
     for (const [name, value] of Object.entries(element.props ?? {})) {
-      if (!ATTRIBUTE_SETS["*"].has(name) && !ATTRIBUTE_SETS[element.meta.tag].has(name)) {
+      if (!isValidAttribute(element.meta.tag, name)) {
         continue;
       }
-      const key = ATTRIBUTE_MAP[name] ?? name;
+      const key = getRealAttributeName(name);
       node.setAttribute(key, value ?? "");
     }
-    host.appendChild(node);
     return node;
   }
 
   static appendNodeDeep(element, host) {
-    const node = this.appendNode(element, host);
+    const node = this.createNode(element, host);
+    host.appendChild(node);
     this.appendChildren(element, node);
   }
 }
@@ -94,10 +99,10 @@ export class HTMLPrint {
   static appendNodeDeep(element, tokens) {
     tokens.push(`<${element.meta.tag}`);
     for (const [name, value] of Object.entries(element.props ?? {})) {
-      if (!ATTRIBUTE_SETS["*"].has(name) && !ATTRIBUTE_SETS[element.meta.tag].has(name)) {
+      if (!isValidAttribute(element.meta.tag, name)) {
         continue;
       }
-      const key = ATTRIBUTE_MAP[name] ?? name;
+      const key = getRealAttributeName(name);
       tokens.push(` ${key}="${value ?? ""}"`);
     }
     tokens.push(`>`);
