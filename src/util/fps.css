@@ -1,5 +1,10 @@
-body > div:last-child > canvas {
+.stats {
   position: fixed;
   right: 0;
   bottom: 0;
+}
+
+.stats > canvas {
+  display: initial !important;
+  float: left;
 }
