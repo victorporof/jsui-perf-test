@@ -1,4 +1,4 @@
-export const oncePerAnimationFrame = fn => {
+export const justOnceUntilNextFrame = fn => {
   let pending;
 
   return (...args) => {
@@ -9,12 +9,28 @@ export const oncePerAnimationFrame = fn => {
   };
 };
 
-export const lockstep = (iterA, iterB, cb) => {
+export const justOnceWhenIdle = (fn, options = { timeout: 0 }) => {
+  let pending;
+
+  return (...args) => {
+    if (!pending) {
+      pending = requestIdleCallback(() => {
+        pending = null;
+        fn(...args);
+      }, options);
+    }
+  };
+};
+
+export const lockstepArr = (iterA, iterB, cb) => {
   iterA = iterA ?? [];
   iterB = iterB ?? [];
 
-  for (let i = 0; i < Math.max(iterA.length, iterB.length); i++) {
+  for (let i = 0; i < iterA.length; i++) {
     cb(iterA[i], iterB[i]);
+  }
+  for (let i = iterA.length; i < iterB.length; i++) {
+    cb(undefined, iterB[i]);
   }
 };
 

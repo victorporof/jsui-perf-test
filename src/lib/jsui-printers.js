@@ -1,56 +1,44 @@
 import { getRealAttributeName, isValidAttribute } from "./jsui-attributes";
-import { DOMNode, Fragment, Text } from "./jsui-primitive";
-
-export class DOMPrintShallow {
-  static toDOM(element) {
-    if (element.type == DOMNode) {
-      return DOMPrint.createNode(element);
-    }
-    if (element.type == Text) {
-      return DOMPrint.createText(element);
-    }
-    return null;
-  }
-}
+import { DOMFragment, DOMNode, DOMText } from "./jsui-primitive";
 
 export class DOMPrint {
-  static printInto(element, host) {
+  static printInto(rendered, host) {
     while (host.firstChild) {
       host.removeChild(host.firstChild);
     }
-    host.appendChild(this.toDOM(element));
+    host.appendChild(this.toDOM(rendered));
   }
 
-  static toDOM(element, host = document.createDocumentFragment()) {
-    if (element.type == DOMNode) {
-      this.appendNodeDeep(element, host);
-    } else if (element.type == Fragment) {
-      this.appendChildren(element, host);
-    } else if (element.type == Text) {
-      this.appendText(element, host);
+  static toDOM(rendered, host = document.createDocumentFragment()) {
+    if (rendered.element.type == DOMFragment) {
+      this.appendChildren(rendered, host);
+    } else if (rendered.element.type == DOMText) {
+      this.appendText(rendered, host);
+    } else if (rendered.element.type == DOMNode) {
+      this.appendNode(rendered, host);
     }
     return host;
   }
 
-  static createText(element) {
-    return document.createTextNode(element.meta.value);
-  }
-
-  static appendText(element, host) {
-    const node = this.createText(element);
-    host.appendChild(node);
-  }
-
-  static appendChildren(element, host) {
-    for (const child of element.props.children) {
+  static appendChildren(rendered, host) {
+    for (const child of rendered.element.props.children) {
       this.toDOM(child.rendered, host);
     }
   }
 
-  static createNode(element) {
-    const node = document.createElement(element.meta.tag);
-    for (const [name, value] of Object.entries(element.props ?? {})) {
-      if (!isValidAttribute(element.meta.tag, name)) {
+  static createText(value) {
+    return document.createTextNode(value);
+  }
+
+  static appendText(rendered, host) {
+    const node = this.createText(rendered.element.meta.value);
+    host.appendChild(node);
+  }
+
+  static createNode(tag, props) {
+    const node = document.createElement(tag);
+    for (const [name, value] of Object.entries(props ?? {})) {
+      if (!isValidAttribute(tag, name)) {
         continue;
       }
       const key = getRealAttributeName(name);
@@ -59,54 +47,54 @@ export class DOMPrint {
     return node;
   }
 
-  static appendNodeDeep(element, host) {
-    const node = this.createNode(element, host);
+  static appendNode(rendered, host) {
+    const node = this.createNode(rendered.element.meta.tag, rendered.element.props, host);
     host.appendChild(node);
-    this.appendChildren(element, node);
+    this.appendChildren(rendered, node);
   }
 }
 
 export class HTMLPrint {
-  static printInto(element, host) {
-    host.innerHTML = this.toHTML(element);
+  static printInto(rendered, host) {
+    host.innerHTML = this.toHTML(rendered);
   }
 
-  static toHTML(element, tokens = []) {
-    return this.toTokens(element, tokens).join("");
+  static toHTML(rendered, tokens = []) {
+    return this.toTokens(rendered, tokens).join("");
   }
 
-  static toTokens(element, tokens = []) {
-    if (element.type == DOMNode) {
-      this.appendNodeDeep(element, tokens);
-    } else if (element.type == Fragment) {
-      this.appendChildren(element, tokens);
-    } else if (element.type == Text) {
-      this.appendText(element, tokens);
+  static toTokens(rendered, tokens = []) {
+    if (rendered.element.type == DOMFragment) {
+      this.appendChildren(rendered, tokens);
+    } else if (rendered.element.type == DOMText) {
+      this.appendText(rendered, tokens);
+    } else if (rendered.element.type == DOMNode) {
+      this.appendNode(rendered, tokens);
     }
     return tokens;
   }
 
-  static appendText(element, tokens) {
-    tokens.push(element.meta.value);
-  }
-
-  static appendChildren(element, tokens) {
-    for (const child of element.props.children) {
+  static appendChildren(rendered, tokens) {
+    for (const child of rendered.element.props.children) {
       this.toTokens(child.rendered, tokens);
     }
   }
 
-  static appendNodeDeep(element, tokens) {
-    tokens.push(`<${element.meta.tag}`);
-    for (const [name, value] of Object.entries(element.props ?? {})) {
-      if (!isValidAttribute(element.meta.tag, name)) {
+  static appendText(rendered, tokens) {
+    tokens.push(rendered.element.meta.value);
+  }
+
+  static appendNode(rendered, tokens) {
+    tokens.push(`<${rendered.element.meta.tag}`);
+    for (const [name, value] of Object.entries(rendered.element.props ?? {})) {
+      if (!isValidAttribute(rendered.element.meta.tag, name)) {
         continue;
       }
       const key = getRealAttributeName(name);
       tokens.push(` ${key}="${value ?? ""}"`);
     }
     tokens.push(`>`);
-    this.appendChildren(element, tokens);
-    tokens.push(`</${element.meta.tag}>`);
+    this.appendChildren(rendered, tokens);
+    tokens.push(`</${rendered.element.meta.tag}>`);
   }
 }

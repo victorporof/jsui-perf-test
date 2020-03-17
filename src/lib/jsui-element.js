@@ -1,7 +1,8 @@
-import { DOMNode, Fragment, Nil, Text } from "./jsui-primitive";
-import { lockstep } from "./jsui-util";
+import { DOMFragment, DOMText } from "./jsui-primitive";
+import { Rendered } from "./jsui-rendered";
+import { lockstepArr } from "./jsui-util";
 
-export const ELEMENT = Symbol("JsUI Element");
+export const ELEMENT_REF = Symbol("JsUI Element");
 
 export class Element {
   constructor(type, props, children, meta) {
@@ -16,15 +17,12 @@ export class Element {
       return element;
     }
     if (element instanceof Array) {
-      return new Element(Fragment, null, element);
+      return new Element(DOMFragment, null, element);
     }
     if (typeof element == "number" || typeof element == "string") {
-      return new Element(Text, null, null, { value: element });
+      return new Element(DOMText, null, null, { value: element });
     }
-    if (element == null) {
-      return new Element(Nil);
-    }
-    throw new Error("Unknown element type");
+    throw new Error("Unknown child element type");
   }
 
   getComponent() {
@@ -34,7 +32,7 @@ export class Element {
 
     const Constructor = this.type;
     this.component = new Constructor();
-    this.component[ELEMENT] = this;
+    this.component[ELEMENT_REF] = this;
 
     return this.component;
   }
@@ -45,13 +43,12 @@ export class Element {
     }
 
     this.component = element.component;
+    this.component[ELEMENT_REF] = this;
     this.rendered = element.rendered;
-
-    this.component[ELEMENT] = this;
   }
 
-  updateTreeIn(container) {
-    this.container = container;
+  updateTree(scheduler) {
+    this.scheduler = scheduler;
 
     const component = this.getComponent();
     const nextState = this.nextState ?? component.state;
@@ -63,25 +60,21 @@ export class Element {
     component.props = this.props;
     component.state = nextState;
 
-    const prevRendered = this.rendered;
-    const nextRendered = (this.rendered = Element.sanitize(component.render()));
+    const oldRendered = this.rendered;
+    const newRendered = (this.rendered = new Rendered(component.render()));
 
-    nextRendered.return = this;
-    nextRendered.dom = prevRendered?.dom;
+    newRendered.owner = this;
 
-    lockstep(prevRendered?.props.children, nextRendered.props.children, (oldChild, newChild) => {
+    const oldChildren = oldRendered?.element.props.children;
+    const newChildren = newRendered.element.props.children;
+    lockstepArr(oldChildren, newChildren, (oldChild, newChild) => {
       newChild?.persistFrom(oldChild);
-      newChild?.updateTreeIn(container);
+      newChild?.updateTree(scheduler);
     });
   }
 
   receiveState(nextState) {
     this.nextState = nextState;
-    this.container.flushTreeWhenPossible();
-  }
-
-  didMount(dom) {
-    this.dom = dom;
-    requestAnimationFrame(() => this.return.component.componentDidMount());
+    this.scheduler.computeNextUpdateOnceThisFrame();
   }
 }

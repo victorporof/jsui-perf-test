@@ -1,8 +1,10 @@
-import { Container } from "./jsui-container";
+import { Scheduler } from "./jsui-scheduler";
 
 export default class JsUIDOM {
   static render(element, host) {
-    const container = new Container(element, host);
-    container.flushTreeIntoHost();
+    host.prepare();
+
+    const scheduler = new Scheduler(element, host);
+    scheduler.computeNextUpdate();
   }
 }

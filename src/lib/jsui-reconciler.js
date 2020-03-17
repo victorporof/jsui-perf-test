@@ -1,61 +1,101 @@
 import { getRealAttributeName, isValidAttribute } from "./jsui-attributes";
 import { diff } from "./jsui-diff";
-import { Fragment } from "./jsui-primitive";
-import { DOMPrint, DOMPrintShallow, HTMLPrint } from "./jsui-printers";
+import { DOMFragment, DOMNode, DOMText } from "./jsui-primitive";
+import { DOMPrint, HTMLPrint } from "./jsui-printers";
+import { ADDED_FRAGMENT, ADDED_NODE, ADDED_TEXT, DEL_ATRR, SET_ATTR, SET_TEXT } from "./polyfill";
 
 export class DOMReplaceReconciler {
-  static reconcile(oldElement, newElement, host) {
-    DOMPrint.printInto(newElement, host);
+  static reconcile(oldRendered, newRendered, host) {
+    DOMPrint.printInto(newRendered, host);
   }
 }
 
 export class InnerHTMLReplaceReconciler {
-  static reconcile(oldElement, newElement, host) {
-    HTMLPrint.printInto(newElement, host);
+  static reconcile(oldRendered, newRendered, host) {
+    HTMLPrint.printInto(newRendered, host);
   }
 }
 
 export class DiffingReconciler {
-  static reconcile(oldElement, newElement, host) {
-    diff(oldElement, newElement, {
-      onAdded: (element, parent) => this.onAdded(element, parent, host),
+  static diff(oldRendered, newRendered) {
+    const changelist = [];
+    const mountlist = [];
+
+    diff(oldRendered, newRendered, null, changelist, mountlist, {
+      onAdded: this.onAdded,
       onRemoved: this.onRemoved,
       onSetText: this.onSetText,
       onSetAttribute: this.onSetAttribute,
-      onRemoveAtrribute: this.onRemoveAtrribute
+      onRemovedAttribute: this.onRemovedAttribute
     });
+
+    return { changelist, mountlist };
   }
 
-  static onAdded(element, parent, host) {
-    const parentNode = parent?.dom ?? host;
+  static async upload(host, update) {
+    await host.render(update.changelist);
 
-    if (element.type == Fragment) {
-      element.didMount(parentNode);
-    } else {
-      const node = DOMPrintShallow.toDOM(element);
-      parentNode.appendChild(node);
-      element.didMount(node);
+    for (const rendered of update.mountlist) {
+      rendered.owner.component.componentDidMount();
     }
   }
 
-  static onRemoved() {
+  static onAdded = (changelist, mountlist, rendered, parentRendered) => {
+    if (rendered.element.type == DOMFragment) {
+      this.onAddedFragment(changelist, rendered, parentRendered);
+    } else if (rendered.element.type == DOMText) {
+      this.onAddedText(changelist, rendered, parentRendered);
+    } else if (rendered.element.type == DOMNode) {
+      this.onAddedNode(changelist, rendered, parentRendered);
+    }
+    mountlist.push(rendered);
+  };
+
+  static onAddedFragment = (changelist, rendered, parentRendered) => {
+    const uid = rendered.owner.component.uid;
+    const parentUid = parentRendered?.owner.component.uid;
+
+    changelist.push([ADDED_FRAGMENT, uid, parentUid]);
+  };
+
+  static onAddedText = (changelist, rendered, parentRendered) => {
+    const uid = rendered.owner.component.uid;
+    const parentUid = parentRendered?.owner.component.uid;
+
+    const value = rendered.element.meta.value;
+    changelist.push([ADDED_TEXT, value, uid, parentUid]);
+  };
+
+  static onAddedNode = (changelist, rendered, parentRendered) => {
+    const uid = rendered.owner.component.uid;
+    const parentUid = parentRendered?.owner.component.uid;
+
+    const type = rendered.element.meta.tag;
+    const props = rendered.element.props;
+    changelist.push([ADDED_NODE, type, props, uid, parentUid]);
+  };
+
+  static onRemoved = () => {
     // TODO
-  }
+  };
 
-  static onSetText(element, value) {
-    element.dom.nodeValue = value;
-  }
+  static onSetText = (changelist, rendered, value) => {
+    changelist.push([SET_TEXT, rendered.owner.component.uid, value]);
+  };
 
-  static onSetAttribute(element, name, value) {
-    if (!isValidAttribute(element.meta.tag, name)) {
+  static onSetAttribute = (changelist, rendered, name, value) => {
+    if (!isValidAttribute(rendered.element.meta.tag, name)) {
       return;
     }
     const key = getRealAttributeName(name);
-    element.dom.setAttribute(key, value);
-  }
+    changelist.push([SET_ATTR, rendered.owner.component.uid, key, value]);
+  };
 
-  static onRemovedAttribute(element, name) {
+  static onRemovedAttribute = (changelist, rendered, name) => {
+    if (!isValidAttribute(rendered.element.meta.tag, name)) {
+      return;
+    }
     const key = getRealAttributeName(name);
-    element.dom.removeAttribute(key ?? name);
-  }
+    changelist.push([DEL_ATRR, rendered.owner.component.uid, key]);
+  };
 }

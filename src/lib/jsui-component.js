@@ -1,7 +1,13 @@
-import { ELEMENT } from "./jsui-element";
+import shortid from "shortid";
+
+import { ELEMENT_REF } from "./jsui-element";
 
 export class Component {
   props = {};
+
+  constructor() {
+    this.uid = shortid.generate();
+  }
 
   componentDidMount() {
     // noop
@@ -12,6 +18,6 @@ export class Component {
   }
 
   setState(nextState) {
-    this[ELEMENT].receiveState(nextState);
+    this[ELEMENT_REF].receiveState(nextState);
   }
 }

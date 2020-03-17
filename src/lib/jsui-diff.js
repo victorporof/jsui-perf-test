@@ -1,37 +1,63 @@
-import { Text } from "./jsui-primitive";
-import { lockstep, lockstepObj } from "./jsui-util";
+import { DOMText } from "./jsui-primitive";
+import { lockstepArr, lockstepObj } from "./jsui-util";
 
-export const diff = (oldElement, newElement, listeners, parentElement = null) => {
-  if (oldElement == newElement) {
+export const diff = (
+  oldRendered,
+  newRendered,
+  parentRendered,
+  changelist,
+  mountlist,
+  callbacks
+) => {
+  if (oldRendered == newRendered) {
     return;
   }
-
-  if (oldElement == null) {
-    listeners.onAdded(newElement, parentElement);
-  } else if (newElement == null) {
+  if (oldRendered == null) {
+    whenAdded(newRendered, parentRendered, changelist, mountlist, callbacks);
+    checkChildrenChanged(oldRendered, newRendered, changelist, mountlist, callbacks);
+  } else if (newRendered == null) {
     // TODO
-  } else if (oldElement.type != newElement.type) {
+  } else if (oldRendered.element.type != newRendered.element.type) {
     // TODO
-  } else if (newElement.type == Text) {
-    const prevTextValue = oldElement.meta.value;
-    const nextTextValue = newElement.meta.value;
-    if (prevTextValue != nextTextValue) {
-      listeners.onSetText(newElement, nextTextValue);
-    }
+  } else if (newRendered.element.type == DOMText) {
+    whenTextChanged(oldRendered, newRendered, changelist, callbacks);
   } else {
-    lockstepObj(oldElement.props, newElement.props, (propName, prevValue, nextValue) => {
-      if (propName == "children") {
-        return;
-      }
-      if (nextValue === undefined) {
-        listeners.onRemovedAtrribute(newElement, propName);
-      } else if (prevValue != nextValue) {
-        listeners.onSetAttribute(newElement, propName, nextValue);
-      }
-    });
+    checkAttrChanged(oldRendered, newRendered, changelist, callbacks);
+    checkChildrenChanged(oldRendered, newRendered, changelist, mountlist, callbacks);
   }
+};
 
-  lockstep(oldElement?.props.children, newElement?.props.children, (oldChild, newChild) => {
-    diff(oldChild?.rendered, newChild?.rendered, listeners, newElement);
+const whenAdded = (newRendered, parentRendered, changelist, mountlist, callbacks) => {
+  callbacks.onAdded(changelist, mountlist, newRendered, parentRendered);
+};
+
+const whenTextChanged = (oldRendered, newRendered, changelist, callbacks) => {
+  const prevTextValue = oldRendered.element.meta.value;
+  const nextTextValue = newRendered.element.meta.value;
+  if (prevTextValue != nextTextValue) {
+    callbacks.onSetText(changelist, newRendered, nextTextValue);
+  }
+};
+
+const checkAttrChanged = (oldRendered, newRendered, changelist, callbacks) => {
+  const prevProps = oldRendered.element.props;
+  const nextProps = newRendered.element.props;
+  lockstepObj(prevProps, nextProps, (propName, prevValue, nextValue) => {
+    if (propName == "children") {
+      return;
+    }
+    if (nextValue === undefined) {
+      callbacks.onRemovedAttribute(changelist, newRendered, propName);
+    } else if (prevValue != nextValue) {
+      callbacks.onSetAttribute(changelist, newRendered, propName, nextValue);
+    }
+  });
+};
+
+const checkChildrenChanged = (oldRendered, newRendered, changelist, mountlist, callbacks) => {
+  const oldChildren = oldRendered?.element.props.children;
+  const newChildren = newRendered.element.props.children;
+  lockstepArr(oldChildren, newChildren, (oldChild, newChild) => {
+    diff(oldChild?.rendered, newChild?.rendered, newRendered, changelist, mountlist, callbacks);
   });
 };

@@ -1,9 +1,11 @@
+import "./lib/polyfill";
+
 import "./util/fps";
+import "./util/fps.css";
+
 import "./benchmark";
 
-import "./util/fps.css";
-import "./index.css";
-import "./env.css";
-
+import "./css/harness.css";
+import "./css/content.css";
+import "./css/layout-flex.css";
 // import "./layout-block.css";
-import "./layout-flex.css";

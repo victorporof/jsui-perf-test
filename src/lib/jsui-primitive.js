@@ -1,16 +1,16 @@
 import { Component } from "./jsui-component";
-import { ELEMENT } from "./jsui-element";
+import { ELEMENT_REF } from "./jsui-element";
 
 export class Primitive extends Component {
   render() {
-    return this[ELEMENT];
+    return this[ELEMENT_REF];
   }
 }
 
 export class Nil extends Primitive {}
 
-export class Text extends Primitive {}
+export class DOMFragment extends Primitive {}
 
-export class Fragment extends Primitive {}
+export class DOMText extends Primitive {}
 
 export class DOMNode extends Primitive {}
