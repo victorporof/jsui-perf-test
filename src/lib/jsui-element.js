@@ -47,7 +47,7 @@ export class Element {
     this.rendered = element.rendered;
   }
 
-  updateTree(scheduler) {
+  updateTree(scheduler, parent) {
     this.scheduler = scheduler;
 
     const component = this.getComponent();
@@ -64,12 +64,13 @@ export class Element {
     const newRendered = (this.rendered = new Rendered(component.render()));
 
     newRendered.owner = this;
+    newRendered.parent = parent;
 
     const oldChildren = oldRendered?.element.props.children;
     const newChildren = newRendered.element.props.children;
     lockstepArr(oldChildren, newChildren, (oldChild, newChild) => {
       newChild?.persistFrom(oldChild);
-      newChild?.updateTree(scheduler);
+      newChild?.updateTree(scheduler, this);
     });
   }
 

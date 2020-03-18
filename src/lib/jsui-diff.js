@@ -13,7 +13,7 @@ export const diff = (
     return;
   }
   if (oldRendered == null) {
-    whenAdded(newRendered, parentRendered, changelist, mountlist, callbacks);
+    whenAdded(newRendered, parentRendered?.nonFragmentRendered, changelist, mountlist, callbacks);
     checkChildrenChanged(oldRendered, newRendered, changelist, mountlist, callbacks);
   } else if (newRendered == null) {
     // TODO

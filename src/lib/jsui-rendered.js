@@ -4,6 +4,8 @@ import { DOMFragment, DOMText, Nil } from "./jsui-primitive";
 export class Rendered {
   constructor(element) {
     this.element = Rendered.sanitize(element);
+    this.owner = null;
+    this.parent = null;
   }
 
   static sanitize(element) {
@@ -20,5 +22,12 @@ export class Rendered {
       return new Element(Nil);
     }
     throw new Error("Unknown element type");
+  }
+
+  get nonFragmentRendered() {
+    if (this.element.type === DOMFragment) {
+      return this.parent.rendered.nonFragmentRendered;
+    }
+    return this;
   }
 }

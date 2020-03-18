@@ -1,8 +1,8 @@
 import { getRealAttributeName, isValidAttribute } from "./jsui-attributes";
 import { diff } from "./jsui-diff";
-import { DOMFragment, DOMNode, DOMText } from "./jsui-primitive";
+import { DOMNode, DOMText } from "./jsui-primitive";
 import { DOMPrint, HTMLPrint } from "./jsui-printers";
-import { ADDED_FRAGMENT, ADDED_NODE, ADDED_TEXT, DEL_ATRR, SET_ATTR, SET_TEXT } from "./polyfill";
+import { ADDED_NODE, ADDED_TEXT, DEL_ATRR, SET_ATTR, SET_TEXT } from "./polyfill";
 
 export class DOMReplaceReconciler {
   static reconcile(oldRendered, newRendered, host) {
@@ -41,21 +41,12 @@ export class DiffingReconciler {
   }
 
   static onAdded = (changelist, mountlist, rendered, parentRendered) => {
-    if (rendered.element.type == DOMFragment) {
-      this.onAddedFragment(changelist, rendered, parentRendered);
-    } else if (rendered.element.type == DOMText) {
+    if (rendered.element.type == DOMText) {
       this.onAddedText(changelist, rendered, parentRendered);
     } else if (rendered.element.type == DOMNode) {
       this.onAddedNode(changelist, rendered, parentRendered);
     }
     mountlist.push(rendered);
-  };
-
-  static onAddedFragment = (changelist, rendered, parentRendered) => {
-    const uid = rendered.owner.component.uid;
-    const parentUid = parentRendered?.owner.component.uid;
-
-    changelist.push([ADDED_FRAGMENT, uid, parentUid]);
   };
 
   static onAddedText = (changelist, rendered, parentRendered) => {
