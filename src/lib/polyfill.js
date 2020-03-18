@@ -1,9 +1,9 @@
-export const ADDED_TEXT = 2;
-export const ADDED_NODE = 3;
-export const REMOVED = 4;
-export const SET_TEXT = 5;
-export const SET_ATTR = 6;
-export const DEL_ATRR = 7;
+export const ADDED_TEXT = 1;
+export const ADDED_NODE = 2;
+export const REMOVED = 3;
+export const SET_TEXT = 4;
+export const SET_ATTR = 5;
+export const DEL_ATRR = 6;
 
 HTMLElement.prototype.prepare = function() {
   this.__nodes = new Map();
