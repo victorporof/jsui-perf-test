@@ -16,7 +16,12 @@ export default env => ({
         use: [{ loader: "html-loader" }]
       },
       {
+        test: /\.shadow\.css$/,
+        use: [{ loader: "to-string-loader" }, { loader: "css-loader" }]
+      },
+      {
         test: /\.css$/,
+        exclude: /\.shadow\.css$/,
         use: [{ loader: "style-loader" }, { loader: "css-loader" }]
       }
     ]

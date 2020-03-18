@@ -47,7 +47,7 @@ const checkAttrChanged = (oldRendered, newRendered, changelist, callbacks) => {
       return;
     }
     if (nextValue === undefined) {
-      callbacks.onRemovedAttribute(changelist, newRendered, propName);
+      // TODO
     } else if (prevValue != nextValue) {
       callbacks.onSetAttribute(changelist, newRendered, propName, nextValue);
     }

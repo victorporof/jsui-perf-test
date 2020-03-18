@@ -1,8 +1,8 @@
-import { gatherValidRealAttributes, withValidRealAttribute } from "./jsui-attributes";
+import { gatherValidRealAttributes } from "./jsui-attributes";
 import { diff } from "./jsui-diff";
 import { DOMNode, DOMText } from "./jsui-primitive";
 import { DOMPrint, HTMLPrint } from "./jsui-printers";
-import { ADDED_NODE, ADDED_TEXT, DEL_ATRR, SET_ATTR, SET_TEXT } from "./polyfill";
+import { CHANGE_TYPE } from "./polyfill";
 
 export class DOMReplaceReconciler {
   static reconcile(oldRendered, newRendered, host) {
@@ -33,7 +33,7 @@ export class DiffingReconciler {
   }
 
   static async upload(host, update) {
-    await host.render(update.changelist);
+    host.render(update.changelist);
 
     for (const rendered of update.mountlist) {
       rendered.owner.component.componentDidMount();
@@ -50,39 +50,43 @@ export class DiffingReconciler {
   };
 
   static onAddedText = (changelist, rendered, parentRendered) => {
-    const uid = rendered.owner.component.uid;
-    const parentUid = parentRendered?.owner.component.uid;
-
-    const value = rendered.element.meta.value;
-    changelist.push([ADDED_TEXT, value, uid, parentUid]);
+    const id = rendered.owner.component.uid;
+    const parentId = parentRendered?.owner.component.uid;
+    const textContent = rendered.element.meta.value;
+    changelist.push(
+      { type: CHANGE_TYPE.CREATE_TEXT_NODE, id, textContent },
+      { type: CHANGE_TYPE.APPEND, id, parentId }
+    );
   };
 
   static onAddedNode = (changelist, rendered, parentRendered) => {
-    const uid = rendered.owner.component.uid;
-    const parentUid = parentRendered?.owner.component.uid;
-
-    const tag = rendered.element.meta.tag;
-    const props = gatherValidRealAttributes(tag, rendered.element.props);
-    changelist.push([ADDED_NODE, tag, props, uid, parentUid]);
+    const id = rendered.owner.component.uid;
+    const parentId = parentRendered?.owner.component.uid;
+    const tagName = rendered.element.meta.tag;
+    const attributes = gatherValidRealAttributes(tagName, rendered.element.props);
+    changelist.push(
+      { type: CHANGE_TYPE.CREATE_ELEMENT, id, tagName },
+      { type: CHANGE_TYPE.SET_ATTRIBUTE, id, attributes },
+      { type: CHANGE_TYPE.APPEND, id, parentId }
+    );
   };
 
   static onRemoved = () => {
     // TODO
   };
 
-  static onSetText = (changelist, rendered, value) => {
-    changelist.push([SET_TEXT, rendered.owner.component.uid, value]);
+  static onSetText = (changelist, rendered, textContent) => {
+    const id = rendered.owner.component.uid;
+    changelist.push({ type: CHANGE_TYPE.SET_TEXT_CONTENT, id, textContent });
   };
 
   static onSetAttribute = (changelist, rendered, name, value) => {
-    withValidRealAttribute(rendered.element.meta.tag, name, key => {
-      changelist.push([SET_ATTR, rendered.owner.component.uid, key, value]);
-    });
+    const id = rendered.owner.component.uid;
+    const attributes = gatherValidRealAttributes(rendered.element.meta.tag, rendered.element.props);
+    changelist.push({ type: CHANGE_TYPE.SET_ATTRIBUTE, id, attributes });
   };
 
-  static onRemovedAttribute = (changelist, rendered, name) => {
-    withValidRealAttribute(rendered.element.meta.tag, name, key => {
-      changelist.push([DEL_ATRR, rendered.owner.component.uid, key]);
-    });
+  static onRemovedAttribute = () => {
+    // TODO
   };
 }

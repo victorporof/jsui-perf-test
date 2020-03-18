@@ -1,64 +1,69 @@
-export const ADDED_TEXT = 1;
-export const ADDED_NODE = 2;
-export const REMOVED = 3;
-export const SET_TEXT = 4;
-export const SET_ATTR = 5;
-export const DEL_ATRR = 6;
-
-HTMLElement.prototype.prepare = function() {
-  this.__nodes = new Map();
+export const CHANGE_TYPE = {
+  CREATE_TEXT_NODE: "CreateTextNode",
+  CREATE_ELEMENT: "CreateElement",
+  APPEND: "Append",
+  REMOVE: "Remove",
+  SET_ATTRIBUTE: "SetAttribute",
+  SET_TEXT_CONTENT: "SetTextContent"
 };
 
-HTMLElement.prototype.render = function(changelist) {
-  return new Promise((resolve, reject) => {
+HTMLElement.prototype.attachOpaqueShadow ||= function() {
+  return new OpaqueShadowRoot(this);
+};
+
+class OpaqueShadowRoot {
+  constructor(root) {
+    this.root = root;
+    this.nodes = new Map();
+  }
+
+  render(changelist) {
     for (const change of changelist) {
-      const type = change[0];
-      if (type == ADDED_TEXT) {
-        onAddedText(this, change);
-      } else if (type == ADDED_NODE) {
-        onAddedNode(this, change);
-      } else if (type == REMOVED) {
+      const { type } = change;
+
+      if (type == CHANGE_TYPE.CREATE_TEXT_NODE) {
+        this.handleCreateTextNode(change);
+      } else if (type == CHANGE_TYPE.CREATE_ELEMENT) {
+        this.handleCreateElement(change);
+      } else if (type == CHANGE_TYPE.APPEND) {
+        this.handleAppend(change);
+      } else if (type == CHANGE_TYPE.REMOVE) {
         // TODO
-      } else if (type == SET_TEXT) {
-        onSetText(this, change);
-      } else if (type == SET_ATTR) {
-        onSetAttribute(this, change);
-      } else if (type == DEL_ATRR) {
-        onRemovedAttribute(this, change);
+      } else if (type == CHANGE_TYPE.SET_ATTRIBUTE) {
+        this.handleSetAttribute(change);
+      } else if (type == CHANGE_TYPE.REMOVE_ATTRIBUTE) {
+        // TODO
+      } else if (type == CHANGE_TYPE.SET_TEXT_CONTENT) {
+        this.handleSetTextContent(change);
       }
     }
-    resolve();
-  });
-};
-
-const onAddedText = (root, [, value, uid, parentUid]) => {
-  const parent = root.__nodes.get(parentUid) ?? root;
-  const node = document.createTextNode(value);
-  parent.appendChild(node);
-  root.__nodes.set(uid, node);
-};
-
-const onAddedNode = (root, [, tag, attributes, uid, parentUid]) => {
-  const parent = root.__nodes.get(parentUid) ?? root;
-  const node = document.createElement(tag);
-  for (const [key, value] of Object.entries(attributes ?? {})) {
-    node.setAttribute(key, value ?? "");
   }
-  parent.appendChild(node);
-  root.__nodes.set(uid, node);
-};
 
-const onSetText = (root, [, uid, value]) => {
-  const node = root.__nodes.get(uid);
-  node.nodeValue = value;
-};
+  handleCreateTextNode({ id, textContent }) {
+    const node = document.createTextNode(textContent);
+    this.nodes.set(id, node);
+  }
 
-const onSetAttribute = (root, [, uid, key, value]) => {
-  const node = root.__nodes.get(uid);
-  node.setAttribute(key, value);
-};
+  handleCreateElement({ id, tagName }) {
+    const node = document.createElement(tagName);
+    this.nodes.set(id, node);
+  }
 
-const onRemovedAttribute = (root, [, uid, key]) => {
-  const node = root.__nodes.get(uid);
-  node.removeAttribute(key);
-};
+  handleAppend({ id, parentId }) {
+    const parent = this.nodes.get(parentId) ?? this.root;
+    const node = this.nodes.get(id);
+    parent.appendChild(node);
+  }
+
+  handleSetTextContent({ id, textContent }) {
+    const node = this.nodes.get(id);
+    node.nodeValue = textContent;
+  }
+
+  handleSetAttribute({ id, attributes }) {
+    const node = this.nodes.get(id);
+    for (const [key, value] of Object.entries(attributes ?? {})) {
+      node.setAttribute(key, value ?? "");
+    }
+  }
+}
