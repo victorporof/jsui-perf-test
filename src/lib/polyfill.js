@@ -1,5 +1,3 @@
-import { DOMPrint } from "./jsui-printers";
-
 export const ADDED_TEXT = 2;
 export const ADDED_NODE = 3;
 export const REMOVED = 4;
@@ -35,14 +33,17 @@ HTMLElement.prototype.render = function(changelist) {
 
 const onAddedText = (root, [, value, uid, parentUid]) => {
   const parent = root.__nodes.get(parentUid) ?? root;
-  const node = DOMPrint.createText(value);
+  const node = document.createTextNode(value);
   parent.appendChild(node);
   root.__nodes.set(uid, node);
 };
 
-const onAddedNode = (root, [, tag, props, uid, parentUid]) => {
+const onAddedNode = (root, [, tag, attributes, uid, parentUid]) => {
   const parent = root.__nodes.get(parentUid) ?? root;
-  const node = DOMPrint.createNode(tag, props);
+  const node = document.createElement(tag);
+  for (const [key, value] of Object.entries(attributes ?? {})) {
+    node.setAttribute(key, value ?? "");
+  }
   parent.appendChild(node);
   root.__nodes.set(uid, node);
 };

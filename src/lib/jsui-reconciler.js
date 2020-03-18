@@ -1,4 +1,4 @@
-import { getRealAttributeName, isValidAttribute } from "./jsui-attributes";
+import { gatherValidRealAttributes, withValidRealAttribute } from "./jsui-attributes";
 import { diff } from "./jsui-diff";
 import { DOMNode, DOMText } from "./jsui-primitive";
 import { DOMPrint, HTMLPrint } from "./jsui-printers";
@@ -61,9 +61,9 @@ export class DiffingReconciler {
     const uid = rendered.owner.component.uid;
     const parentUid = parentRendered?.owner.component.uid;
 
-    const type = rendered.element.meta.tag;
-    const props = rendered.element.props;
-    changelist.push([ADDED_NODE, type, props, uid, parentUid]);
+    const tag = rendered.element.meta.tag;
+    const props = gatherValidRealAttributes(tag, rendered.element.props);
+    changelist.push([ADDED_NODE, tag, props, uid, parentUid]);
   };
 
   static onRemoved = () => {
@@ -75,18 +75,14 @@ export class DiffingReconciler {
   };
 
   static onSetAttribute = (changelist, rendered, name, value) => {
-    if (!isValidAttribute(rendered.element.meta.tag, name)) {
-      return;
-    }
-    const key = getRealAttributeName(name);
-    changelist.push([SET_ATTR, rendered.owner.component.uid, key, value]);
+    withValidRealAttribute(rendered.element.meta.tag, name, key => {
+      changelist.push([SET_ATTR, rendered.owner.component.uid, key, value]);
+    });
   };
 
   static onRemovedAttribute = (changelist, rendered, name) => {
-    if (!isValidAttribute(rendered.element.meta.tag, name)) {
-      return;
-    }
-    const key = getRealAttributeName(name);
-    changelist.push([DEL_ATRR, rendered.owner.component.uid, key]);
+    withValidRealAttribute(rendered.element.meta.tag, name, key => {
+      changelist.push([DEL_ATRR, rendered.owner.component.uid, key]);
+    });
   };
 }

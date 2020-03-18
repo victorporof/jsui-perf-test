@@ -20,7 +20,7 @@ export class Element {
       return new Element(DOMFragment, null, element);
     }
     if (typeof element == "number" || typeof element == "string") {
-      return new Element(DOMText, null, null, { value: element });
+      return new Element(DOMText, null, null, { value: `${element}` });
     }
     throw new Error("Unknown child element type");
   }

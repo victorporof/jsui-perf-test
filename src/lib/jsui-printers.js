@@ -1,4 +1,4 @@
-import { getRealAttributeName, isValidAttribute } from "./jsui-attributes";
+import { gatherValidRealAttributes } from "./jsui-attributes";
 import { DOMFragment, DOMNode, DOMText } from "./jsui-primitive";
 
 export class DOMPrint {
@@ -26,29 +26,18 @@ export class DOMPrint {
     }
   }
 
-  static createText(value) {
-    return document.createTextNode(value);
-  }
-
   static appendText(rendered, host) {
-    const node = this.createText(rendered.element.meta.value);
+    const node = document.createTextNode(rendered.element.meta.value);
     host.appendChild(node);
   }
 
-  static createNode(tag, props) {
+  static appendNode(rendered, host) {
+    const tag = rendered.element.meta.tag;
+    const props = rendered.element.props;
     const node = document.createElement(tag);
-    for (const [name, value] of Object.entries(props ?? {})) {
-      if (!isValidAttribute(tag, name)) {
-        continue;
-      }
-      const key = getRealAttributeName(name);
+    for (const [key, value] of gatherValidRealAttributes(tag, props)) {
       node.setAttribute(key, value ?? "");
     }
-    return node;
-  }
-
-  static appendNode(rendered, host) {
-    const node = this.createNode(rendered.element.meta.tag, rendered.element.props, host);
     host.appendChild(node);
     this.appendChildren(rendered, node);
   }
@@ -85,16 +74,14 @@ export class HTMLPrint {
   }
 
   static appendNode(rendered, tokens) {
-    tokens.push(`<${rendered.element.meta.tag}`);
-    for (const [name, value] of Object.entries(rendered.element.props ?? {})) {
-      if (!isValidAttribute(rendered.element.meta.tag, name)) {
-        continue;
-      }
-      const key = getRealAttributeName(name);
+    const tag = rendered.element.meta.tag;
+    const props = rendered.element.props;
+    tokens.push(`<${tag}`);
+    for (const [key, value] of gatherValidRealAttributes(tag, props)) {
       tokens.push(` ${key}="${value ?? ""}"`);
     }
     tokens.push(`>`);
     this.appendChildren(rendered, tokens);
-    tokens.push(`</${rendered.element.meta.tag}>`);
+    tokens.push(`</${tag}>`);
   }
 }

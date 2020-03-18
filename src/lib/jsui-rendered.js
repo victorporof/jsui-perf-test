@@ -16,7 +16,7 @@ export class Rendered {
       return new Element(DOMFragment, null, element);
     }
     if (typeof element == "number" || typeof element == "string") {
-      return new Element(DOMText, null, null, { value: element });
+      return new Element(DOMText, null, null, { value: `${element}` });
     }
     if (element == null) {
       return new Element(Nil);

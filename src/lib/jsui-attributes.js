@@ -13,10 +13,23 @@ const ATTRIBUTE_MAP = {
   className: "class"
 };
 
-export const getRealAttributeName = name => {
+export const getRealAttributeKey = name => {
   return ATTRIBUTE_MAP[name] ?? name;
 };
 
 export const isValidAttribute = (tag, name) => {
   return ATTRIBUTE_SETS["*"].has(name) || ATTRIBUTE_SETS[tag].has(name);
+};
+
+export const withValidRealAttribute = (tag, name, cb) => {
+  if (isValidAttribute(tag, name)) {
+    cb(getRealAttributeKey(name));
+  }
+};
+
+export const gatherValidRealAttributes = (tag, props, store = {}) => {
+  for (const [name, value] of Object.entries(props ?? {})) {
+    withValidRealAttribute(tag, name, key => (store[key] = value ?? ""));
+  }
+  return store;
 };
