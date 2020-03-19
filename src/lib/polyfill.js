@@ -7,14 +7,20 @@ export const CHANGE_TYPE = {
   SET_TEXT_CONTENT: "SetTextContent"
 };
 
+export const PRIVATE_SUBTREE = Symbol("OpaqueShadowRoot Private Subtree");
+export const PRIVATE_NODES = Symbol("OpaqueShadowRoot Private Nodes");
+
 HTMLElement.prototype.attachOpaqueShadow ||= function() {
-  return new OpaqueShadowRoot(this);
+  if (this.opaqueShadowRoot) {
+    throw new DOMException("Failed to execute 'attachOpaqueShadow' on 'Element'");
+  }
+  return (this.opaqueShadowRoot = new window.OpaqueShadowRoot(this));
 };
 
-class OpaqueShadowRoot {
-  constructor(root) {
-    this.root = root;
-    this.nodes = new Map();
+window.OpaqueShadowRoot ||= class {
+  constructor(host) {
+    this[PRIVATE_SUBTREE] = host.attachShadow({ mode: "closed" });
+    this[PRIVATE_NODES] = new Map();
   }
 
   render(changelist) {
@@ -41,29 +47,29 @@ class OpaqueShadowRoot {
 
   handleCreateTextNode({ id, textContent }) {
     const node = document.createTextNode(textContent);
-    this.nodes.set(id, node);
+    this[PRIVATE_NODES].set(id, node);
   }
 
   handleCreateElement({ id, tagName }) {
     const node = document.createElement(tagName);
-    this.nodes.set(id, node);
+    this[PRIVATE_NODES].set(id, node);
   }
 
   handleAppend({ id, parentId }) {
-    const parent = this.nodes.get(parentId) ?? this.root;
-    const node = this.nodes.get(id);
+    const parent = this[PRIVATE_NODES].get(parentId) ?? this[PRIVATE_SUBTREE];
+    const node = this[PRIVATE_NODES].get(id);
     parent.appendChild(node);
   }
 
   handleSetTextContent({ id, textContent }) {
-    const node = this.nodes.get(id);
+    const node = this[PRIVATE_NODES].get(id);
     node.nodeValue = textContent;
   }
 
   handleSetAttribute({ id, attributes }) {
-    const node = this.nodes.get(id);
+    const node = this[PRIVATE_NODES].get(id);
     for (const [key, value] of Object.entries(attributes ?? {})) {
       node.setAttribute(key, value ?? "");
     }
   }
-}
+};

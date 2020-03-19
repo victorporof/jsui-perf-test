@@ -12,17 +12,18 @@ export class Scheduler {
   onAnimationFrame = () => {
     requestAnimationFrame(this.onAnimationFrame);
 
-    const update = this.pending.pop();
+    const [update, cb] = this.pending.pop();
     if (update) {
       Reconciler.upload(this.host, update);
+      cb?.();
     }
   };
 
-  computeNextUpdate() {
+  computeNextUpdate(cb) {
     const prevTree = this.element.rendered;
     this.element.updateTree(this);
     const nextTree = this.element.rendered;
-    this.pending.push(Reconciler.diff(prevTree, nextTree));
+    this.pending.push([Reconciler.diff(prevTree, nextTree), cb]);
   }
 
   computeNextUpdateOnceWhenIdle = justOnceWhenIdle(() => {

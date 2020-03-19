@@ -1,8 +1,9 @@
+import { CHANGE_TYPE } from "../polyfill";
+
 import { gatherValidRealAttributes } from "./jsui-attributes";
 import { diff } from "./jsui-diff";
 import { DOMNode, DOMText } from "./jsui-primitive";
 import { DOMPrint, HTMLPrint } from "./jsui-printers";
-import { CHANGE_TYPE } from "./polyfill";
 
 export class DOMReplaceReconciler {
   static reconcile(oldRendered, newRendered, host) {

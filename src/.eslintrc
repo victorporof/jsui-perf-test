@@ -4,6 +4,7 @@
     "node": false
   },
   "globals": {
+    "LIB": true,
     "ENV": true
   },
   "rules": {
