@@ -12,7 +12,7 @@ export class Scheduler {
   onAnimationFrame = () => {
     requestAnimationFrame(this.onAnimationFrame);
 
-    const [update, cb] = this.pending.pop();
+    const [update, cb] = this.pending.pop() ?? [];
     if (update) {
       Reconciler.upload(this.host, update);
       cb?.();

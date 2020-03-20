@@ -33,7 +33,7 @@ export class DiffingReconciler {
     return { changelist, mountlist };
   }
 
-  static async upload(host, update) {
+  static upload(host, update) {
     host.render(update.changelist);
 
     for (const rendered of update.mountlist) {
