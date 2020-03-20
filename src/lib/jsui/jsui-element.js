@@ -44,7 +44,10 @@ export class Element {
 
     this.component = element.component;
     this.component[ELEMENT_REF] = this;
+
     this.rendered = element.rendered;
+    this.rendered.parent = parent;
+    this.rendered.owner = this;
   }
 
   updateTree(scheduler, parent) {
