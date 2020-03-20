@@ -1,8 +1,11 @@
 import { Element } from "./jsui-element";
-import { DOMNode } from "./jsui-primitive";
+import { DOMFragment, DOMNode } from "./jsui-primitive";
 
 export default class JsUI {
   static createElement(type, props, ...children) {
+    if (typeof type == "undefined") {
+      return new Element(DOMFragment, props, children);
+    }
     if (typeof type == "string") {
       return new Element(DOMNode, props, children, { tag: type });
     }

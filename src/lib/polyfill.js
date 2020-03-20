@@ -12,7 +12,7 @@ export const PRIVATE_NODES = Symbol("OpaqueShadowRoot Private Nodes");
 
 HTMLElement.prototype.attachOpaqueShadow ||= function() {
   if (this.opaqueShadowRoot) {
-    throw new DOMException("Failed to execute 'attachOpaqueShadow' on 'Element'");
+    throw new DOMException("Failed to execute 'attachOpaqueShadow' on 'Element'.");
   }
   return (this.opaqueShadowRoot = new window.OpaqueShadowRoot(this));
 };

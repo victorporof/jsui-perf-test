@@ -1,3 +1,5 @@
+import assert from "assert";
+
 import keyBy from "lodash/keyBy";
 import mapValues from "lodash/mapValues";
 import attr from "react-html-attributes";
@@ -17,19 +19,20 @@ export const getRealAttributeKey = name => {
   return ATTRIBUTE_MAP[name] ?? name;
 };
 
-export const isValidAttribute = (tag, name) => {
+export const isValidAttributeName = (tag, name) => {
   return ATTRIBUTE_SETS["*"].has(name) || ATTRIBUTE_SETS[tag].has(name);
 };
 
-export const withValidRealAttribute = (tag, name, cb) => {
-  if (isValidAttribute(tag, name)) {
-    cb(getRealAttributeKey(name));
-  }
-};
+export const gatherAttributes = (tag, props, store = {}) => {
+  assert(props);
 
-export const gatherValidRealAttributes = (tag, props, store = {}) => {
-  for (const [name, value] of Object.entries(props ?? {})) {
-    withValidRealAttribute(tag, name, key => (store[key] = value ?? ""));
+  for (const name in props) {
+    if (isValidAttributeName(tag, name)) {
+      const key = getRealAttributeKey(name);
+      const value = props[name];
+      store[key] = value ?? "";
+    }
   }
+
   return store;
 };

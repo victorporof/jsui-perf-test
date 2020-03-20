@@ -7,12 +7,12 @@
     "dev:react": "webpack-dev-server --mode development --env.lib=react",
     "dev:preact": "webpack-dev-server --mode development --env.lib=preact",
     "dev:jsui": "webpack-dev-server --mode development --env.lib=jsui",
-    "start:react": "webpack-dev-server --mode production --env.lib=react",
-    "start:preact": "webpack-dev-server --mode production --env.lib=preact",
-    "start:jsui": "webpack-dev-server --mode production --env.lib=jsui",
-    "build:react": "webpack --mode production --env.lib=react",
-    "build:preact": "webpack --mode production --env.lib=preact",
-    "build:jsui": "webpack --mode production --env.lib=jsui"
+    "start:react": "BABEL_ENV=production webpack-dev-server --mode production --env.lib=react",
+    "start:preact": "BABEL_ENV=production webpack-dev-server --mode production --env.lib=preact",
+    "start:jsui": "BABEL_ENV=production webpack-dev-server --mode production --env.lib=jsui",
+    "build:react": "BABEL_ENV=production webpack --mode production --env.lib=react",
+    "build:preact": "BABEL_ENV=production webpack --mode production --env.lib=preact",
+    "build:jsui": "BABEL_ENV=production webpack --mode production --env.lib=jsui"
   },
   "devDependencies": {
     "@babel/core": "^7.8.7",
@@ -26,6 +26,8 @@
     "@babel/register": "^7.8.6",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.0.6",
+    "babel-plugin-transform-remove-console": "^6.9.4",
+    "babel-plugin-unassert": "^3.0.1",
     "css-loader": "^3.4.2",
     "eslint": "^6.8.0",
     "eslint-config-google": "^0.14.0",
@@ -41,12 +43,13 @@
     "webpack-dev-server": "^3.10.3"
   },
   "dependencies": {
+    "assert": "^2.0.0",
+    "events": "^3.1.0",
     "lodash": "^4.17.15",
     "preact": "^10.3.4",
     "react": "^15",
     "react-dom": "^15",
     "react-html-attributes": "^1.4.6",
-    "shortid": "^2.2.15",
     "stats.js": "^0.17.0"
   }
 }

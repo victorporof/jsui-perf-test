@@ -1,13 +1,12 @@
-import shortid from "shortid";
+import assert from "assert";
 
-import { ELEMENT_REF } from "./jsui-element";
+import { ELEMENT_REF, NEXT_STATE } from "./jsui-element";
 
 export class Component {
   props = {};
-
-  constructor() {
-    this.uid = shortid.generate();
-  }
+  state = null;
+  [NEXT_STATE] = null;
+  [ELEMENT_REF] = null;
 
   componentDidMount() {
     // noop
@@ -18,6 +17,11 @@ export class Component {
   }
 
   setState(nextState) {
-    this[ELEMENT_REF].receiveState(nextState);
+    this[NEXT_STATE] = nextState;
+    this[ELEMENT_REF].scheduler.computeUpdateNextFrame();
+  }
+
+  render() {
+    assert.fail();
   }
 }

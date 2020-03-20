@@ -1,8 +1,13 @@
-import { DOMFragment, DOMText } from "./jsui-primitive";
-import { Rendered } from "./jsui-rendered";
+import assert from "assert";
+
+import { shallowDiff } from "./jsui-diff";
+import * as Primitive from "./jsui-primitive";
 import { lockstepArr } from "./jsui-util";
 
 export const ELEMENT_REF = Symbol("JsUI Element");
+export const NEXT_STATE = Symbol("JsUI Next State");
+
+let count = 0;
 
 export class Element {
   constructor(type, props, children, meta) {
@@ -17,68 +22,99 @@ export class Element {
       return element;
     }
     if (element instanceof Array) {
-      return new Element(DOMFragment, null, element);
+      return new Element(Primitive.DOMFragment, null, element);
     }
     if (typeof element == "number" || typeof element == "string") {
-      return new Element(DOMText, null, null, { value: `${element}` });
+      return new Element(Primitive.TextLeaf, null, null, { value: `${element}` });
     }
-    throw new Error("Unknown child element type");
+    if (element == null) {
+      return new Element(Primitive.NullLeaf);
+    }
+    assert.fail();
   }
 
-  getComponent() {
+  tryReusing(element) {
+    if (this == element) {
+      return;
+    }
+    if (this.type != element?.type) {
+      return;
+    }
+    assert(!this.uid);
+    assert(!this.component);
+    assert(!this.rendered);
+
+    this.uid = element.uid;
+
+    this.component = element.component;
+    this.component[ELEMENT_REF] = this;
+
+    this.rendered = element.rendered;
+  }
+
+  ensureInstanced() {
     if (this.component) {
-      return this.component;
+      return;
     }
 
     const Constructor = this.type;
     this.component = new Constructor();
     this.component[ELEMENT_REF] = this;
 
-    return this.component;
+    this.uid = `${count++}`;
+
+    this.reconciler.onInstantiated(this);
   }
 
-  persistFrom(element) {
-    if (this.type != element?.type) {
-      return;
-    }
-
-    this.component = element.component;
-    this.component[ELEMENT_REF] = this;
-
-    this.rendered = element.rendered;
-    this.rendered.parent = parent;
-    this.rendered.owner = this;
-  }
-
-  updateTree(scheduler, parent) {
+  update(scheduler, reconciler, prevSelf, parentElement) {
     this.scheduler = scheduler;
+    this.reconciler = reconciler;
 
-    const component = this.getComponent();
-    const nextState = this.nextState ?? component.state;
+    this.tryReusing(prevSelf);
+    this.ensureInstanced();
 
-    if (this.rendered && !component.shouldComponentUpdate(this.props, nextState)) {
+    const nextState = this.component[NEXT_STATE] ?? this.component.state;
+    this.component[NEXT_STATE] = null;
+
+    if (this.rendered && !this.component.shouldComponentUpdate(this.props, nextState)) {
       return;
     }
 
-    component.props = this.props;
-    component.state = nextState;
+    this.component.props = this.props;
+    this.component.state = nextState;
 
-    const oldRendered = this.rendered;
-    const newRendered = (this.rendered = new Rendered(component.render()));
+    const prevRenderedElement = this.rendered;
+    const nextRenderedElement = (this.rendered = Element.sanitize(this.component.render()));
+    const forwardParentElement = this.type == Primitive.DOMNode ? this : parentElement;
 
-    newRendered.owner = this;
-    newRendered.parent = parent;
+    shallowDiff(prevSelf, this, parentElement, reconciler);
 
-    const oldChildren = oldRendered?.element.props.children;
-    const newChildren = newRendered.element.props.children;
-    lockstepArr(oldChildren, newChildren, (oldChild, newChild) => {
-      newChild?.persistFrom(oldChild);
-      newChild?.updateTree(scheduler, this);
-    });
+    if (this.isUserComponent()) {
+      nextRenderedElement.update(scheduler, reconciler, prevRenderedElement, forwardParentElement);
+      return;
+    }
+
+    if (this.isDOMNodeOrFragment() || this.isRoot()) {
+      const prevChildren = prevRenderedElement?.props.children;
+      const nextChildren = nextRenderedElement.props.children;
+      lockstepArr(prevChildren, nextChildren, (prevChildElement, nextChildElement) => {
+        nextChildElement.update(scheduler, reconciler, prevChildElement, forwardParentElement);
+      });
+    }
   }
 
-  receiveState(nextState) {
-    this.nextState = nextState;
-    this.scheduler.computeNextUpdateOnceThisFrame();
+  isRoot() {
+    assert(this.component);
+    return this.component instanceof Primitive.RootNode;
+  }
+
+  isDOMNodeOrFragment() {
+    assert(this.component);
+    return this.component instanceof Primitive.DOMNodeOrFragment;
+  }
+
+  isUserComponent() {
+    assert(this.component);
+    return !(this.component instanceof Primitive.InternalComponent);
   }
 }

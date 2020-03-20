@@ -1,87 +1,93 @@
-import { gatherValidRealAttributes } from "./jsui-attributes";
-import { DOMFragment, DOMNode, DOMText } from "./jsui-primitive";
+import { gatherAttributes } from "./jsui-attributes";
+import { DOMFragment, DOMNode, TextLeaf } from "./jsui-primitive";
 
 export class DOMPrint {
-  static printInto(rendered, host) {
-    while (host.firstChild) {
-      host.removeChild(host.firstChild);
+  static printInto(element, host) {
+    const node = this.toDOM(element);
+    if (host.firstChild) {
+      host.replaceChild(node, host.firstChild);
+    } else {
+      host.appendChild(node);
     }
-    host.appendChild(this.toDOM(rendered));
   }
 
-  static toDOM(rendered, host = document.createDocumentFragment()) {
-    if (rendered.element.type == DOMFragment) {
-      this.appendChildren(rendered, host);
-    } else if (rendered.element.type == DOMText) {
-      this.appendText(rendered, host);
-    } else if (rendered.element.type == DOMNode) {
-      this.appendNode(rendered, host);
+  static toDOM(element, host = document.createDocumentFragment()) {
+    if (element.type == TextLeaf) {
+      this.appendText(element, host);
+    } else if (element.type == DOMNode) {
+      this.appendNode(element, host);
+    } else if (element.type == DOMFragment) {
+      this.appendChildren(element, host);
+    } else {
+      this.toDOM(element.rendered, host);
     }
     return host;
   }
 
-  static appendChildren(rendered, host) {
-    for (const child of rendered.element.props.children) {
-      this.toDOM(child.rendered, host);
-    }
-  }
-
-  static appendText(rendered, host) {
-    const node = document.createTextNode(rendered.element.meta.value);
+  static appendText(element, host) {
+    const node = document.createTextNode(element.meta.value);
     host.appendChild(node);
   }
 
-  static appendNode(rendered, host) {
-    const tag = rendered.element.meta.tag;
-    const props = rendered.element.props;
+  static appendNode(element, host) {
+    const tag = element.meta.tag;
+    const props = element.props;
     const node = document.createElement(tag);
-    for (const [key, value] of gatherValidRealAttributes(tag, props)) {
+    for (const [key, value] of Object.entries(gatherAttributes(tag, props))) {
       node.setAttribute(key, value ?? "");
     }
     host.appendChild(node);
-    this.appendChildren(rendered, node);
+    this.appendChildren(element, node);
+  }
+
+  static appendChildren(element, host) {
+    for (const child of element.props.children) {
+      this.toDOM(child, host);
+    }
   }
 }
 
 export class HTMLPrint {
-  static printInto(rendered, host) {
-    host.innerHTML = this.toHTML(rendered);
+  static printInto(element, host) {
+    host.innerHTML = this.toHTML(element);
   }
 
-  static toHTML(rendered, tokens = []) {
-    return this.toTokens(rendered, tokens).join("");
+  static toHTML(element, tokens = []) {
+    return this.toTokens(element, tokens).join("");
   }
 
-  static toTokens(rendered, tokens = []) {
-    if (rendered.element.type == DOMFragment) {
-      this.appendChildren(rendered, tokens);
-    } else if (rendered.element.type == DOMText) {
-      this.appendText(rendered, tokens);
-    } else if (rendered.element.type == DOMNode) {
-      this.appendNode(rendered, tokens);
+  static toTokens(element, tokens = []) {
+    if (element.type == TextLeaf) {
+      this.appendText(element, tokens);
+    } else if (element.type == DOMNode) {
+      this.appendNode(element, tokens);
+    } else if (element.type == DOMFragment) {
+      this.appendChildren(element, tokens);
+    } else {
+      this.toTokens(element.rendered, tokens);
     }
     return tokens;
   }
 
-  static appendChildren(rendered, tokens) {
-    for (const child of rendered.element.props.children) {
-      this.toTokens(child.rendered, tokens);
-    }
+  static appendText(element, tokens) {
+    tokens.push(element.meta.value);
   }
 
-  static appendText(rendered, tokens) {
-    tokens.push(rendered.element.meta.value);
-  }
-
-  static appendNode(rendered, tokens) {
-    const tag = rendered.element.meta.tag;
-    const props = rendered.element.props;
+  static appendNode(element, tokens) {
+    const tag = element.meta.tag;
+    const props = element.props;
     tokens.push(`<${tag}`);
-    for (const [key, value] of gatherValidRealAttributes(tag, props)) {
+    for (const [key, value] of Object.entries(gatherAttributes(tag, props))) {
       tokens.push(` ${key}="${value ?? ""}"`);
     }
     tokens.push(`>`);
-    this.appendChildren(rendered, tokens);
+    this.appendChildren(element, tokens);
     tokens.push(`</${tag}>`);
+  }
+
+  static appendChildren(element, tokens) {
+    for (const child of element.props.children) {
+      this.toTokens(child, tokens);
+    }
   }
 }

@@ -9,15 +9,11 @@ import App from "./app";
 const wrapper = document.getElementById("container");
 const root = wrapper.attachOpaqueShadow();
 
-ReactDOM.render(<App />, root, () => {
-  root.render([
-    { type: "CreateElement", id: "content-css", tagName: "style" },
-    { type: "CreateElement", id: "layout-css", tagName: "style" },
-    { type: "Append", id: "content-css" },
-    { type: "Append", id: "layout-css" },
-    { type: "CreateTextNode", id: "content-css-src", textContent: contentCss },
-    { type: "CreateTextNode", id: "layout-css-src", textContent: layoutCss },
-    { type: "Append", id: "content-css-src", parentId: "content-css" },
-    { type: "Append", id: "layout-css-src", parentId: "layout-css" }
-  ]);
-});
+ReactDOM.render(
+  <div>
+    <style>{contentCss}</style>
+    <style>{layoutCss}</style>
+    <App />
+  </div>,
+  root
+);

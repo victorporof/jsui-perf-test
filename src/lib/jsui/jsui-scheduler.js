@@ -1,36 +1,22 @@
-import { DiffingReconciler as Reconciler } from "./jsui-reconciler";
-import { justOnceUntilNextFrame, justOnceWhenIdle } from "./jsui-util";
-
 export class Scheduler {
-  constructor(element, host) {
-    this.element = element;
-    this.host = host;
-    this.pending = [];
+  constructor(root) {
+    this.root = root;
+    this.dirty = false;
     requestAnimationFrame(this.onAnimationFrame);
   }
 
   onAnimationFrame = () => {
     requestAnimationFrame(this.onAnimationFrame);
 
-    const [update, cb] = this.pending.pop() ?? [];
-    if (update) {
-      Reconciler.upload(this.host, update);
-      cb?.();
+    this.root.uploadNextUpdate();
+
+    if (this.dirty) {
+      this.dirty = false;
+      this.root.computeNextUpdate();
     }
   };
 
-  computeNextUpdate(cb) {
-    const prevTree = this.element.rendered;
-    this.element.updateTree(this);
-    const nextTree = this.element.rendered;
-    this.pending.push([Reconciler.diff(prevTree, nextTree), cb]);
+  computeUpdateNextFrame() {
+    this.dirty = true;
   }
-
-  computeNextUpdateOnceWhenIdle = justOnceWhenIdle(() => {
-    this.computeNextUpdate();
-  });
-
-  computeNextUpdateOnceThisFrame = justOnceUntilNextFrame(() => {
-    this.computeNextUpdate();
-  });
 }
