@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 
 import contentCss from "../css/content.shadow.css";
-import layoutCss from "../css/layout-flex.shadow.css";
+import layoutCss from "../css/layout-block.shadow.css";
 
 import App from "./app";
 

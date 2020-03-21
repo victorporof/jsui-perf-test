@@ -87,7 +87,7 @@ export default class DBMon extends Component {
 
     return (
       <div className="dbmon">
-        {times(1).map(i => (
+        {times(3).map(i => (
           <div key={i} className="table table-striped latest-data">
             <div className="tbody">{databases()}</div>
           </div>
