@@ -16,6 +16,14 @@
   "rules": {
     "require-jsdoc": "off",
     "no-invalid-this": "off",
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": false,
+        "optionalDependencies": false,
+        "peerDependencies": false
+      }
+    ],
     "sort-imports": ["error", { "ignoreDeclarationSort": true }],
     "import/order": ["error", { "newlines-between": "always", "alphabetize": { "order": "asc" } }]
   }
