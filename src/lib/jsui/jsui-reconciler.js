@@ -53,12 +53,7 @@ export class InnerHTMLReplaceReconciler extends BaseReconciler {
   }
 }
 
-export class DiffingReconciler extends BaseReconciler {
-  upload(element, host, update) {
-    host.render(update.changelist);
-    super.upload(element, host, update);
-  }
-
+export class BaseDiffingReconciler extends BaseReconciler {
   onAdded = (element, parentElement) => {
     if (element.type == TextLeaf) {
       this.onAddedText(element, parentElement);
@@ -107,4 +102,29 @@ export class DiffingReconciler extends BaseReconciler {
   onRemovedAttribute = () => {
     // TODO
   };
+}
+
+export class LocalDiffingReconciler extends BaseDiffingReconciler {
+  upload(element, host, update) {
+    host.render(update.changelist);
+    super.upload(element, host, update);
+  }
+}
+
+export class RemoteDiffingReconciler extends BaseDiffingReconciler {
+  generation = 0;
+
+  upload(element, host, update) {
+    host.contentWindow.postMessage(
+      {
+        type: "update",
+        payload: {
+          generation: this.generation++,
+          changelist: update.changelist
+        }
+      },
+      "*"
+    );
+    super.upload(element, host, update);
+  }
 }

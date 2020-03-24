@@ -2,11 +2,10 @@ import EventEmitter from "events";
 
 import { Element } from "./jsui-element";
 import { RootNode } from "./jsui-primitive";
-import { DiffingReconciler as Reconciler } from "./jsui-reconciler";
 import { Scheduler } from "./jsui-scheduler";
 
 export class Root extends EventEmitter {
-  constructor(element, host) {
+  constructor(Reconciler, element, host) {
     super();
 
     this.element = new Element(RootNode, null, [element]);
@@ -23,8 +22,18 @@ export class Root extends EventEmitter {
   }
 
   uploadNextUpdate() {
-    const update = this.pending.pop();
-    if (update) {
+    const update = {
+      changelist: [],
+      mountlist: []
+    };
+
+    while (this.pending[0]) {
+      const next = this.pending.shift();
+      update.changelist = update.changelist.concat(next.changelist);
+      update.mountlist = update.mountlist.concat(next.mountlist);
+    }
+
+    if (update.changelist.length || update.mountlist.length) {
       this.reconciler.upload(this.element, this.host, update);
       this.emit("uploaded");
     }
