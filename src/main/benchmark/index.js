@@ -1,8 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-import contentCss from "../css/content.shadow.css";
-import layoutCss from "../css/layout-block.shadow.css";
+import contentCss from "../css/content.raw.css";
+import layoutCss from "../css/layout-block.raw.css";
 
 import App from "./app";
 

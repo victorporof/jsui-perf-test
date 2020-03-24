@@ -1,4 +1,4 @@
-import "./lib/polyfill";
+import "../lib/polyfill";
 
 import "./benchmark";
 

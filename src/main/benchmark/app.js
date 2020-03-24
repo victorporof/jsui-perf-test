@@ -1,6 +1,8 @@
 import times from "lodash/times";
 import React, { Component } from "react";
 
+import ENV from "../../../js-repaint-perfs/ENV";
+
 class Query extends Component {
   shouldComponentUpdate(nextProps) {
     if (nextProps.elapsedClassName !== this.props.elapsedClassName) return true;
