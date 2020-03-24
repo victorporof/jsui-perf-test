@@ -3,8 +3,9 @@ import { PRIVATE_SUBTREE } from "../polyfill";
 
 const render = PreactDOM.render;
 
-PreactDOM.render = (element, root, cb) => {
-  render.call(PreactDOM, element, root[PRIVATE_SUBTREE], cb);
+PreactDOM.render = (element, host, cb) => {
+  const opaqueShadowRoot = host.attachOpaqueShadow();
+  render.call(PreactDOM, element, opaqueShadowRoot[PRIVATE_SUBTREE], cb);
 };
 
 export default PreactDOM;

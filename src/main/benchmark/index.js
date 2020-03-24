@@ -7,7 +7,6 @@ import layoutCss from "../css/layout-block.raw.css";
 import App from "./app";
 
 const wrapper = document.getElementById("container");
-const root = wrapper.attachOpaqueShadow();
 
 ReactDOM.render(
   <div>
@@ -15,5 +14,5 @@ ReactDOM.render(
     <style>{layoutCss}</style>
     <App />
   </div>,
-  root
+  wrapper
 );

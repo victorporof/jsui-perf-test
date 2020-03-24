@@ -3,8 +3,9 @@ import { PRIVATE_SUBTREE } from "../polyfill";
 
 const render = ReactDOM.render;
 
-ReactDOM.render = (element, root, cb) => {
-  render.call(ReactDOM, element, root[PRIVATE_SUBTREE], cb);
+ReactDOM.render = (element, host, cb) => {
+  const opaqueShadowRoot = host.attachOpaqueShadow();
+  render.call(ReactDOM, element, opaqueShadowRoot[PRIVATE_SUBTREE], cb);
 };
 
 export default ReactDOM;

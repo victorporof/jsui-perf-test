@@ -3,8 +3,9 @@ import { Root } from "./jsui-root";
 
 export default class JsUIDOM {
   static render(element, host, cb = () => {}) {
-    const root = new Root(Element.sanitize(element), host);
-    root.once("uploaded", cb);
-    root.computeNextUpdate();
+    const opaqueShadowRoot = host.attachOpaqueShadow();
+    const jsuiRoot = new Root(Element.sanitize(element), opaqueShadowRoot);
+    jsuiRoot.once("uploaded", cb);
+    jsuiRoot.computeNextUpdate();
   }
 }
