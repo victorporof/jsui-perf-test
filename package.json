@@ -5,17 +5,13 @@
   "license": "MIT",
   "scripts": {
     "dev:main": "BABEL_ENV=development webpack-dev-server --config webpack/webpack.main.babel.js --mode development",
-    "start:main": "BABEL_ENV=production webpack-dev-server --config webpack/webpack.main.babel.js --mode production",
-    "build:main": "BABEL_ENV=production webpack --mode production",
     "dev:react": "yarn dev:main --env.lib=react",
     "dev:preact": "yarn dev:main --env.lib=preact",
     "dev:jsui": "yarn dev:main --env.lib=jsui",
+    "start:main": "BABEL_ENV=production webpack-dev-server --config webpack/webpack.main.babel.js --mode production",
     "start:react": "yarn start:main --env.lib=react",
     "start:preact": "yarn start:main --env.lib=preact",
-    "start:jsui": "yarn start:main --env.lib=jsui",
-    "build:react": "yarn build:main --env.lib=react",
-    "build:preact": "yarn build:main --env.lib=preact",
-    "build:jsui": "yarn build:main --env.lib=jsui"
+    "start:jsui": "yarn start:main --env.lib=jsui"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",
