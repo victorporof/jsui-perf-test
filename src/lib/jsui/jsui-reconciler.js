@@ -110,3 +110,21 @@ export class LocalDiffingReconciler extends BaseDiffingReconciler {
     super.upload(element, host, update);
   }
 }
+
+export class RemoteDiffingReconciler extends BaseDiffingReconciler {
+  generation = 0;
+
+  upload(element, host, update) {
+    host.contentWindow.postMessage(
+      {
+        type: "update",
+        payload: {
+          generation: this.generation++,
+          changelist: update.changelist
+        }
+      },
+      "*"
+    );
+    super.upload(element, host, update);
+  }
+}

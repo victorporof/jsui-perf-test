@@ -20,5 +20,8 @@ export default (env = {}) =>
       new HtmlWebPackPlugin({
         template: "./src/main/index.html"
       })
-    ]
+    ],
+    devServer: {
+      disableHostCheck: true
+    }
   });

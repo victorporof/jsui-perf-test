@@ -8,10 +8,17 @@
     "dev:react": "yarn dev:main --env.lib=react",
     "dev:preact": "yarn dev:main --env.lib=preact",
     "dev:jsui": "yarn dev:main --env.lib=jsui",
+    "dev:iframe": "BABEL_ENV=development webpack-dev-server --config webpack/webpack.iframe.babel.js --mode development",
+    "dev:jsui-remote": "yarn dev:main --env.lib=jsui-remote",
     "start:main": "BABEL_ENV=production webpack-dev-server --config webpack/webpack.main.babel.js --mode production",
     "start:react": "yarn start:main --env.lib=react",
     "start:preact": "yarn start:main --env.lib=preact",
-    "start:jsui": "yarn start:main --env.lib=jsui"
+    "start:jsui": "yarn start:main --env.lib=jsui",
+    "start:iframe": "BABEL_ENV=production webpack-dev-server --config webpack/webpack.iframe.babel.js --mode production",
+    "start:jsui-remote": "yarn start:main --env.lib=jsui-remote",
+    "hosts:list": "hostile list",
+    "hosts:clean": "hostile remove jsui-server.local",
+    "hosts:setup": "hostile set localhost jsui-server.local"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",
@@ -34,6 +41,7 @@
     "eslint-plugin-import": "^2.20.1",
     "eslint-plugin-react": "^7.19.0",
     "exports-loader": "^0.7.0",
+    "hostile": "^1.3.2",
     "html-loader": "^1.0.0",
     "html-webpack-plugin": "^4.0.1",
     "style-loader": "^1.1.3",

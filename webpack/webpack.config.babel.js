@@ -38,6 +38,10 @@ export default (env = {}) => ({
       jsui: {
         react: path.resolve(__dirname, "../src/lib/jsui/index.js"),
         "react-dom": path.resolve(__dirname, "../src/lib/jsui/jsui-dom.js")
+      },
+      "jsui-remote": {
+        react: path.resolve(__dirname, "../src/lib/jsui/index.js"),
+        "react-dom": path.resolve(__dirname, "../src/lib/jsui/jsui-dom-remote.js")
       }
     }[env.lib]
   }

@@ -14,3 +14,8 @@ label {
 input[type="range"] {
   width: 100%;
 }
+
+#container > * {
+  width: 100%;
+  height: calc(100vh - 45px);
+}
