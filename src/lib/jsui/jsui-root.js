@@ -2,11 +2,10 @@ import EventEmitter from "events";
 
 import { Element } from "./jsui-element";
 import { RootNode } from "./jsui-primitive";
-import { DiffingReconciler as Reconciler } from "./jsui-reconciler";
 import { Scheduler } from "./jsui-scheduler";
 
 export class Root extends EventEmitter {
-  constructor(element, host) {
+  constructor(Reconciler, element, host) {
     super();
 
     this.element = new Element(RootNode, null, [element]);
