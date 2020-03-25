@@ -6,6 +6,10 @@ body {
   color: #333;
 }
 
+body > div:first-child {
+  height: 45px;
+}
+
 label {
   margin-bottom: 5px;
   font-weight: 700;
@@ -13,9 +17,4 @@ label {
 
 input[type="range"] {
   width: 100%;
-}
-
-#container > * {
-  width: 100%;
-  height: calc(100vh - 45px);
 }
