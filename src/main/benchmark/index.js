@@ -9,10 +9,10 @@ import App from "./app";
 const wrapper = document.getElementById("container");
 
 ReactDOM.render(
-  <div>
+  <>
     <style>{contentCss}</style>
     <style>{layoutCss}</style>
     <App />
-  </div>,
+  </>,
   wrapper
 );
