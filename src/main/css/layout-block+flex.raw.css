@@ -8,6 +8,10 @@
   width: calc((100% - var(--dbname-width) - var(--query-count-width)) / 5);
 }
 
+.td * {
+  display: flex;
+}
+
 .td.dbname {
   width: var(--dbname-width);
 }
@@ -19,4 +23,5 @@
 .label {
   padding-top: 0.2em;
   padding-bottom: 0.3em;
+  width: min-content;
 }
