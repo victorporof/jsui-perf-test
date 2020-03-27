@@ -5,6 +5,8 @@ import merge from "webpack-merge";
 
 import config from "./webpack.config.babel";
 
+const DEFAULT_BENCH = "react-basic";
+
 export default (env = {}) =>
   merge(config(env), {
     entry: "./src/main/index.js",
@@ -21,6 +23,18 @@ export default (env = {}) =>
         template: "./src/main/index.html"
       })
     ],
+    resolve: {
+      alias: {
+        ...{
+          "react-basic": {
+            benchmark: path.resolve(__dirname, "../src/main/benchmark/react-basic")
+          },
+          "react-scu": {
+            benchmark: path.resolve(__dirname, "../src/main/benchmark/react-scu")
+          }
+        }[env.bench ?? DEFAULT_BENCH]
+      }
+    },
     devServer: {
       disableHostCheck: true
     }

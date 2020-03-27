@@ -2,6 +2,8 @@ import path from "path";
 
 import webpack from "webpack";
 
+const DEFAULT_LIB = "react";
+
 export default (env = {}) => ({
   devtool: "source-map",
   module: {
@@ -34,22 +36,24 @@ export default (env = {}) => ({
   resolve: {
     extensions: [".js", ".jsx"],
     alias: {
-      react: {
-        react: "react",
-        "react-dom": path.resolve(__dirname, "../src/lib/compat/react-dom.js")
-      },
-      preact: {
-        react: "preact/compat",
-        "react-dom": path.resolve(__dirname, "../src/lib/compat/preact-dom.js")
-      },
-      jsui: {
-        react: path.resolve(__dirname, "../src/lib/jsui/index.js"),
-        "react-dom": path.resolve(__dirname, "../src/lib/jsui/jsui-dom.js")
-      },
-      "jsui-remote": {
-        react: path.resolve(__dirname, "../src/lib/jsui/index.js"),
-        "react-dom": path.resolve(__dirname, "../src/lib/jsui/jsui-dom-remote.js")
-      }
-    }[env.lib]
+      ...{
+        react: {
+          react: "react",
+          "react-dom": path.resolve(__dirname, "../src/lib/compat/react-dom.js")
+        },
+        preact: {
+          react: "preact/compat",
+          "react-dom": path.resolve(__dirname, "../src/lib/compat/preact-dom.js")
+        },
+        jsui: {
+          react: path.resolve(__dirname, "../src/lib/jsui/index.js"),
+          "react-dom": path.resolve(__dirname, "../src/lib/jsui/jsui-dom.js")
+        },
+        "jsui-remote": {
+          react: path.resolve(__dirname, "../src/lib/jsui/index.js"),
+          "react-dom": path.resolve(__dirname, "../src/lib/jsui/jsui-dom-remote.js")
+        }
+      }[env.lib ?? DEFAULT_LIB]
+    }
   }
 });

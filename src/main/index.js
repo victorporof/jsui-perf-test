@@ -1,6 +1,6 @@
-import "../lib/polyfill";
+import "benchmark";
 
-import "./benchmark";
+import "../lib/polyfill";
 
 import "./css/harness.css";
 

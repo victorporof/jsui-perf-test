@@ -76,9 +76,9 @@ export class Element {
     const nextState = this.component[NEXT_STATE] ?? this.component.state;
     this.component[NEXT_STATE] = null;
 
-    // if (this.rendered && !this.component.shouldComponentUpdate(this.props, nextState)) {
-    //   return;
-    // }
+    if (this.rendered && !this.component.shouldComponentUpdate(this.props, nextState)) {
+      return;
+    }
 
     this.component.props = this.props;
     this.component.state = nextState;

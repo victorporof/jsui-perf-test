@@ -1,16 +1,9 @@
 import times from "lodash/times";
 import React, { Component } from "react";
 
-import ENV from "../../../js-repaint-perfs/ENV";
+import ENV from "../../../../js-repaint-perfs/ENV";
 
-class Query extends Component {
-  shouldComponentUpdate(nextProps) {
-    if (nextProps.elapsedClassName !== this.props.elapsedClassName) return true;
-    if (nextProps.formatElapsed !== this.props.formatElapsed) return true;
-    if (nextProps.query !== this.props.query) return true;
-    return false;
-  }
-
+export class Query extends Component {
   render() {
     return (
       <div className={"td Query " + this.props.elapsedClassName}>
@@ -24,12 +17,7 @@ class Query extends Component {
   }
 }
 
-class Database extends Component {
-  shouldComponentUpdate(nextProps) {
-    if (nextProps.lastMutationId === this.props.lastMutationId) return false;
-    return true;
-  }
-
+export class Database extends Component {
   render() {
     return (
       <div className="tr">
