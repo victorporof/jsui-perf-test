@@ -1,3 +1,5 @@
+/* global POLYFILL */
+
 export const CHANGE_TYPE = {
   CREATE_TEXT_NODE: "CreateTextNode",
   CREATE_ELEMENT: "CreateElement",
@@ -10,14 +12,14 @@ export const CHANGE_TYPE = {
 export const PRIVATE_SUBTREE = Symbol("OpaqueShadowRoot Private Subtree");
 export const PRIVATE_NODES = Symbol("OpaqueShadowRoot Private Nodes");
 
-HTMLElement.prototype.attachOpaqueShadow ||= function() {
+function attachOpaqueShadow() {
   if (this.opaqueShadowRoot) {
     throw new DOMException("Failed to execute 'attachOpaqueShadow' on 'Element'.");
   }
   return (this.opaqueShadowRoot = new window.OpaqueShadowRoot(this));
-};
+}
 
-window.OpaqueShadowRoot ||= class {
+class OpaqueShadowRoot {
   constructor(host) {
     this[PRIVATE_SUBTREE] = host.attachShadow({ mode: "closed" });
     this[PRIVATE_NODES] = new Map();
@@ -72,4 +74,12 @@ window.OpaqueShadowRoot ||= class {
       node.setAttribute(key, value ?? "");
     }
   }
-};
+}
+
+if (POLYFILL == "force") {
+  window.OpaqueShadowRoot = OpaqueShadowRoot;
+  HTMLElement.prototype.attachOpaqueShadow = attachOpaqueShadow;
+} else {
+  window.OpaqueShadowRoot ||= OpaqueShadowRoot;
+  HTMLElement.prototype.attachOpaqueShadow ||= attachOpaqueShadow;
+}

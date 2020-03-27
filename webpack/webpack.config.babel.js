@@ -1,5 +1,7 @@
 import path from "path";
 
+import webpack from "webpack";
+
 export default (env = {}) => ({
   devtool: "source-map",
   module: {
@@ -24,6 +26,11 @@ export default (env = {}) => ({
       }
     ]
   },
+  plugins: [
+    new webpack.DefinePlugin({
+      POLYFILL: `"${env.polyfill}"`
+    })
+  ],
   resolve: {
     extensions: [".js", ".jsx"],
     alias: {
