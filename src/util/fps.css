@@ -6,5 +6,5 @@
 
 .stats > canvas {
   display: initial !important;
-  float: left;
+  vertical-align: bottom;
 }
