@@ -1,8 +1,8 @@
+import contentCss from "content";
+import layoutCss from "layout";
+
 import React from "react";
 import ReactDOM from "react-dom";
-
-import contentCss from "../../css/content.raw.css";
-import layoutCss from "../../css/layout-block+flex.raw.css";
 
 import App from "./app";
 
