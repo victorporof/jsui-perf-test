@@ -17,6 +17,7 @@ export class Root {
   uploadNextUpdate() {
     this.pending.sort((a, b) => a.generation - b.generation);
 
+    const generations = [];
     const update = {
       changelist: []
     };
@@ -24,11 +25,17 @@ export class Root {
     while (this.pending[0]?.generation == this.generation) {
       const next = this.pending.shift();
       update.changelist = update.changelist.concat(next.changelist);
+      generations.push(this.generation);
       this.generation++;
     }
 
     if (update.changelist.length) {
+      this.signalWorkStarted(generations);
       this.opaqueShadowRoot.render(update.changelist);
     }
+  }
+
+  signalWorkStarted(generations) {
+    parent.postMessage({ type: "work-started", payload: { generations } }, "*");
   }
 }

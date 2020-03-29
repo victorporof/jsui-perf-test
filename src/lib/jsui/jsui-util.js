@@ -1,3 +1,28 @@
+export const oncePerAnimationFrame = fn => {
+  const pending = [];
+  let waiting = false;
+
+  return (...args) => {
+    const next = () => {
+      if (waiting) {
+        return;
+      }
+      if (!pending.length) {
+        return;
+      }
+      requestAnimationFrame(() => {
+        waiting = false;
+        next();
+      });
+      const args = pending.shift();
+      fn(...args);
+    };
+
+    pending.push(args);
+    next();
+  };
+};
+
 export const justOnceUntilNextFrame = fn => {
   let pending;
 

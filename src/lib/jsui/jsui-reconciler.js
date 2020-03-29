@@ -40,16 +40,18 @@ export class BaseReconciler {
 }
 
 export class DOMReplaceReconciler extends BaseReconciler {
-  upload(element, host, update) {
+  upload(element, host, update, onUploaded) {
     DOMPrint.printInto(element, host[PRIVATE_SUBTREE]);
     super.upload(element, host, update);
+    onUploaded?.();
   }
 }
 
 export class InnerHTMLReplaceReconciler extends BaseReconciler {
-  upload(element, host, update) {
+  upload(element, host, update, onUploaded) {
     HTMLPrint.printInto(element, host[PRIVATE_SUBTREE]);
     super.upload(element, host, update);
+    onUploaded?.();
   }
 }
 
@@ -105,26 +107,47 @@ export class BaseDiffingReconciler extends BaseReconciler {
 }
 
 export class LocalDiffingReconciler extends BaseDiffingReconciler {
-  upload(element, host, update) {
+  upload(element, host, update, onUploaded) {
     host.render(update.changelist);
     super.upload(element, host, update);
+    onUploaded?.();
   }
 }
 
 export class RemoteDiffingReconciler extends BaseDiffingReconciler {
   generation = 0;
+  callbacks = new Map();
 
-  upload(element, host, update) {
+  constructor() {
+    super();
+    window.addEventListener("message", this.onMessage, false);
+  }
+
+  upload(element, host, update, onUploaded) {
+    this.callbacks.set(this.generation, onUploaded);
+
     host.contentWindow.postMessage(
       {
         type: "update",
         payload: {
-          generation: this.generation++,
+          generation: this.generation,
           changelist: update.changelist
         }
       },
       "*"
     );
+
+    this.generation++;
     super.upload(element, host, update);
   }
+
+  onMessage = ({ data }) => {
+    if (data.type != "work-started") {
+      return;
+    }
+    for (const generation of data.payload.generations) {
+      this.callbacks.get(generation)();
+      this.callbacks.delete(generation);
+    }
+  };
 }

@@ -21,7 +21,7 @@ export class Root extends EventEmitter {
     this.pending.push(this.reconciler.end());
   }
 
-  uploadNextUpdate() {
+  uploadNextUpdate(onWillUpload, onUploaded, onSkipped = onWillUpload) {
     const update = {
       changelist: [],
       mountlist: []
@@ -34,8 +34,12 @@ export class Root extends EventEmitter {
     }
 
     if (update.changelist.length || update.mountlist.length) {
-      this.reconciler.upload(this.element, this.host, update);
+      onWillUpload();
+      this.reconciler.upload(this.element, this.host, update, onUploaded);
       this.emit("uploaded");
+      return;
     }
+
+    onSkipped();
   }
 }

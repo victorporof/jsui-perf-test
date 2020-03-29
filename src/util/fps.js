@@ -7,9 +7,4 @@ stats.dom.className = "stats";
 
 document.body.appendChild(stats.dom);
 
-const animate = () => {
-  stats.update();
-  requestAnimationFrame(animate);
-};
-
-requestAnimationFrame(animate);
+export { stats };
