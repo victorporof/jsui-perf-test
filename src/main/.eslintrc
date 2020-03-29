@@ -1,5 +1,5 @@
 {
   "settings": {
-    "import/core-modules": ["benchmark", "content", "layout"]
+    "import/core-modules": ["benchmark", "contentCss", "layoutCss", "containmentCss"]
   }
 }
