@@ -1,9 +1,12 @@
 import path from "path";
 
 import HtmlWebPackPlugin from "html-webpack-plugin";
+import webpack from "webpack";
 import merge from "webpack-merge";
 
 import config from "./webpack.config.babel";
+
+const DEFAULT_TABLE_COUNT = 2;
 
 const DEFAULT_LIB = "react";
 const DEFAULT_BENCH = "react-basic";
@@ -23,6 +26,9 @@ export default (env = {}) =>
     plugins: [
       new HtmlWebPackPlugin({
         template: "./src/main/index.html"
+      }),
+      new webpack.DefinePlugin({
+        TABLE_COUNT: `${env.tableCount ?? DEFAULT_TABLE_COUNT}`
       })
     ],
     resolve: {
