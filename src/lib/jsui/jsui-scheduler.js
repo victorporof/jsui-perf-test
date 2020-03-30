@@ -1,5 +1,3 @@
-import { stats } from "../../util/fps";
-
 export class Scheduler {
   constructor(root) {
     this.root = root;
@@ -10,7 +8,6 @@ export class Scheduler {
 
   onAnimationFrame = () => {
     requestAnimationFrame(this.onAnimationFrame);
-    stats.update();
 
     if (this.rendering) {
       return;

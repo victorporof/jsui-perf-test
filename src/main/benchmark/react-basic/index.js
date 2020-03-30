@@ -5,6 +5,8 @@ import layoutCss from "layoutCss";
 import React from "react";
 import ReactDOM from "react-dom";
 
+import { stats } from "../../../util/fps";
+
 import App from "./app";
 
 const wrapper = document.getElementById("container");
@@ -18,3 +20,10 @@ ReactDOM.render(
   </>,
   wrapper
 );
+
+const animate = () => {
+  stats.update();
+  requestAnimationFrame(animate);
+};
+
+requestAnimationFrame(animate);
