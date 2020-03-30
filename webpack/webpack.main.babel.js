@@ -47,6 +47,10 @@ export default (env = {}) =>
           "block+flex": {
             contentCss: path.resolve(__dirname, "../src/main/css/content.raw.css"),
             layoutCss: path.resolve(__dirname, "../src/main/css/layout-block+flex.raw.css")
+          },
+          table: {
+            contentCss: path.resolve(__dirname, "../src/main/css/content.raw.css"),
+            layoutCss: path.resolve(__dirname, "../src/main/css/layout-table.raw.css")
           }
         }[env.layout ?? DEFAULT_LAYOUT_CSS],
         ...{
