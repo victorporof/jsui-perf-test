@@ -18,19 +18,19 @@ export default (env = {}) => ({
         use: [{ loader: "html-loader" }]
       },
       {
-        test: /\.raw\.css$/,
+        test: /\.css$/,
+        exclude: /\.global\.css$/,
         use: [{ loader: "to-string-loader" }, { loader: "css-loader" }]
       },
       {
-        test: /\.css$/,
-        exclude: /\.raw\.css$/,
+        test: /\.global\.css$/,
         use: [{ loader: "style-loader" }, { loader: "css-loader" }]
       }
     ]
   },
   plugins: [
     new webpack.DefinePlugin({
-      POLYFILL: `"${env.polyfill}"`
+      POLYFILL_MODE: `"${env.polyfill}"`,
     })
   ],
   resolve: {
@@ -49,9 +49,23 @@ export default (env = {}) => ({
           react: path.resolve(__dirname, "../src/lib/jsui/index.js"),
           "react-dom": path.resolve(__dirname, "../src/lib/jsui/jsui-dom.js")
         },
-        "jsui-remote": {
+        "jsui-iframe": {
           react: path.resolve(__dirname, "../src/lib/jsui/index.js"),
-          "react-dom": path.resolve(__dirname, "../src/lib/jsui/jsui-dom-remote.js")
+          "react-dom": path.resolve(__dirname, "../src/lib/jsui/jsui-dom-iframe.js")
+        }
+      }[env.lib ?? DEFAULT_LIB],
+      ...{
+        react: {
+          "containment.css": path.resolve(__dirname, "../src/benchmarks/containment.local.css")
+        },
+        preact: {
+          "containment.css": path.resolve(__dirname, "../src/benchmarks/containment.local.css")
+        },
+        jsui: {
+          "containment.css": path.resolve(__dirname, "../src/benchmarks/containment.local.css")
+        },
+        "jsui-iframe": {
+          "containment.css": path.resolve(__dirname, "../src/benchmarks/containment.remote.css")
         }
       }[env.lib ?? DEFAULT_LIB]
     }

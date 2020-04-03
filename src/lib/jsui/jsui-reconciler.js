@@ -5,6 +5,10 @@ import { DOMNode, TextLeaf } from "./jsui-primitive";
 import { DOMPrint, HTMLPrint } from "./jsui-printers";
 
 export class BaseReconciler {
+  constructor(host) {
+    this.host = host;
+  }
+
   begin() {
     this.changelist = [];
     this.mountlist = [];
@@ -18,7 +22,7 @@ export class BaseReconciler {
     };
   }
 
-  upload(element, host, update) {
+  upload(element, update) {
     for (const component of update.mountlist) {
       component.componentDidMount();
     }
@@ -30,27 +34,47 @@ export class BaseReconciler {
     }
   };
 
-  onAdded = (element, parentElement) => {};
-  onAddedText = (element, parentElement) => {};
-  onAddedNode = (element, parentElement) => {};
-  onRemoved = () => {};
-  onSetText = (element, textContent) => {};
-  onSetAttribute = (element, name, value) => {};
-  onRemovedAttribute = () => {};
+  onAdded = (element, parentElement) => {
+    // noop
+  };
+
+  onAddedText = (element, parentElement) => {
+    // noop
+  };
+
+  onAddedNode = (element, parentElement) => {
+    // noop
+  };
+
+  onRemoved = () => {
+    // noop
+  };
+
+  onSetText = (element, textContent) => {
+    // noop
+  };
+
+  onSetAttribute = (element, name, value) => {
+    // noop
+  };
+
+  onRemovedAttribute = () => {
+    // noop
+  };
 }
 
 export class DOMReplaceReconciler extends BaseReconciler {
-  upload(element, host, update, onUploaded) {
-    DOMPrint.printInto(element, host[PRIVATE_SUBTREE]);
-    super.upload(element, host, update);
+  upload(element, update, onUploaded) {
+    DOMPrint.printInto(element, this.host[PRIVATE_SUBTREE]);
+    super.upload(element, update);
     onUploaded?.();
   }
 }
 
 export class InnerHTMLReplaceReconciler extends BaseReconciler {
-  upload(element, host, update, onUploaded) {
-    HTMLPrint.printInto(element, host[PRIVATE_SUBTREE]);
-    super.upload(element, host, update);
+  upload(element, update, onUploaded) {
+    HTMLPrint.printInto(element, this.host[PRIVATE_SUBTREE]);
+    super.upload(element, update);
     onUploaded?.();
   }
 }
@@ -107,26 +131,26 @@ export class BaseDiffingReconciler extends BaseReconciler {
 }
 
 export class LocalDiffingReconciler extends BaseDiffingReconciler {
-  upload(element, host, update, onUploaded) {
-    host.render(update.changelist);
-    super.upload(element, host, update);
+  upload(element, update, onUploaded) {
+    this.host.render(update.changelist);
+    super.upload(element, update);
     onUploaded?.();
   }
 }
 
 export class RemoteDiffingReconciler extends BaseDiffingReconciler {
-  generation = 0;
-  callbacks = new Map();
+  constructor(host) {
+    super(host);
 
-  constructor() {
-    super();
+    this.generation = 0;
+    this.callbacks = new Map();
     window.addEventListener("message", this.onMessage, false);
   }
 
-  upload(element, host, update, onUploaded) {
+  upload(element, update, onUploaded) {
     this.callbacks.set(this.generation, onUploaded);
 
-    host.contentWindow.postMessage(
+    this.host.contentWindow.postMessage(
       {
         type: "update",
         payload: {
@@ -138,7 +162,7 @@ export class RemoteDiffingReconciler extends BaseDiffingReconciler {
     );
 
     this.generation++;
-    super.upload(element, host, update);
+    super.upload(element, update);
   }
 
   onMessage = ({ data }) => {

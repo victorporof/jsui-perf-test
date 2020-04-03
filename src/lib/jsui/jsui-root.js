@@ -9,10 +9,8 @@ export class Root extends EventEmitter {
     super();
 
     this.element = new Element(RootNode, null, [element]);
-    this.host = host;
-
     this.scheduler = new Scheduler(this);
-    this.reconciler = new Reconciler(this);
+    this.reconciler = new Reconciler(host);
     this.pending = [];
   }
 
@@ -35,7 +33,7 @@ export class Root extends EventEmitter {
 
     if (update.changelist.length || update.mountlist.length) {
       onWillUpload();
-      this.reconciler.upload(this.element, this.host, update, onUploaded);
+      this.reconciler.upload(this.element, update, onUploaded);
       this.emit("uploaded");
       return;
     }

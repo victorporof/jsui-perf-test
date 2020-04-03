@@ -1,0 +1,8 @@
+body {
+  margin: 0;
+}
+
+.stats {
+  bottom: 48px !important;
+  margin-bottom: 1px;
+}

@@ -1,5 +1,3 @@
-/* global POLYFILL */
-
 export const CHANGE_TYPE = {
   CREATE_TEXT_NODE: "CreateTextNode",
   CREATE_ELEMENT: "CreateElement",
@@ -76,7 +74,7 @@ class OpaqueShadowRoot {
   }
 }
 
-if (POLYFILL == "force") {
+if (POLYFILL_MODE == "force") {
   window.OpaqueShadowRoot = OpaqueShadowRoot;
   HTMLElement.prototype.attachOpaqueShadow = attachOpaqueShadow;
 } else {

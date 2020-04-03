@@ -1,20 +1,25 @@
-import { Scheduler } from "./scheduler";
+import { stats } from "../../util/fps";
 
 export class Root {
-  generation = 0;
-
   constructor(host) {
     this.opaqueShadowRoot = host.attachOpaqueShadow();
 
-    this.scheduler = new Scheduler(this);
     this.pending = [];
+    this.generation = 0;
   }
 
-  receiveNextUpdate(update) {
-    this.pending.push(update);
+  listen() {
+    window.addEventListener("message", this.onMessage, false);
   }
 
-  uploadNextUpdate() {
+  onMessage = ({ data }) => {
+    if (data.type != "update") {
+      return;
+    }
+
+    stats.update();
+
+    this.pending.push(data.payload);
     this.pending.sort((a, b) => a.generation - b.generation);
 
     const generations = [];
@@ -30,12 +35,8 @@ export class Root {
     }
 
     if (update.changelist.length) {
-      this.signalWorkStarted(generations);
+      parent.postMessage({ type: "work-started", payload: { generations } }, "*");
       this.opaqueShadowRoot.render(update.changelist);
     }
-  }
-
-  signalWorkStarted(generations) {
-    parent.postMessage({ type: "work-started", payload: { generations } }, "*");
-  }
+  };
 }

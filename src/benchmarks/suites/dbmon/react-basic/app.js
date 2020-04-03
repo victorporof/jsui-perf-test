@@ -1,7 +1,7 @@
 import times from "lodash/times";
 import React, { Component } from "react";
 
-import ENV from "../../../../js-repaint-perfs/ENV";
+import ENV from "../../../../../js-repaint-perfs/ENV";
 
 export class Query extends Component {
   render() {
@@ -44,8 +44,8 @@ export class Database extends Component {
 }
 
 export default class DBMon extends Component {
-  constructor(props) {
-    super(props);
+  constructor(...args) {
+    super(...args);
 
     this.state = {
       databases: []

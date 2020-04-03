@@ -5,10 +5,10 @@ import config from "./webpack.config.babel";
 
 export default (env = {}) =>
   merge(config(env), {
-    entry: "./src/iframe/index.js",
+    entry: "./src/renderers/iframe/index.js",
     plugins: [
       new HtmlWebPackPlugin({
-        template: "./src/iframe/index.html"
+        template: "./src/renderers/iframe/index.html"
       })
     ],
     devServer: {

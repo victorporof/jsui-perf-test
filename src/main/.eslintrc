@@ -1,8 +1,0 @@
-{
-  "globals": {
-    "TABLE_COUNT": true
-  },
-  "settings": {
-    "import/core-modules": ["benchmark", "contentCss", "layoutCss", "containmentCss"]
-  }
-}
