@@ -2,10 +2,10 @@ import path from "path";
 
 import webpack from "webpack";
 
-const DEFAULT_LIB = "react";
-const DEFAULT_POLYFILL_MODE = "normal";
-const DEFAULT_SYNC_MODE = "normal";
-const DEFAULT_SERIALIZER = "json";
+const DEFAULT_LIB = "react"; // react | preact | jsui | jsui-iframe | jsui-webrtc
+const DEFAULT_POLYFILL_MODE = "normal"; // normal | force
+const DEFAULT_SYNC_MODE = "normal"; // normal | strict
+const DEFAULT_SERIALIZER = "identity"; // identity | json
 
 export default (env = {}) => ({
   devtool: "source-map",

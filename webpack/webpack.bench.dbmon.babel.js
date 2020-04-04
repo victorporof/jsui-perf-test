@@ -8,8 +8,8 @@ import config from "./webpack.config.babel";
 
 const SUITES = path.join(__dirname, "../src/benchmarks/suites");
 
-const DEFAULT_BENCH = "react-basic";
-const DEFAULT_LAYOUT_CSS = "block+flex";
+const DEFAULT_BENCH = "react-basic"; // react-basic | react-scu
+const DEFAULT_LAYOUT_CSS = "block+flex"; // block | flex | block+flex | table
 const DEFAULT_TABLE_COUNT = 2;
 
 export default (env = {}) =>

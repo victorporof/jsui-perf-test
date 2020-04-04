@@ -5,7 +5,7 @@ import merge from "webpack-merge";
 
 import config from "./webpack.config.babel";
 
-const DEFAULT_PIPE = "postmessage";
+const DEFAULT_PIPE = "postmessage"; // postmessage | webrtc
 
 export default (env = {}) =>
   merge(config(env), {
