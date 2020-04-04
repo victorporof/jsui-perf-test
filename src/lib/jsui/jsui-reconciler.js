@@ -158,8 +158,6 @@ export class RemoteRenderer extends BaseDiffingReconciler {
   }
 
   upload(element, update, onUploaded) {
-    this.callbacks.set(this.generation, onUploaded);
-
     this.post({
       type: "update",
       payload: {
@@ -168,12 +166,22 @@ export class RemoteRenderer extends BaseDiffingReconciler {
       }
     });
 
-    this.generation++;
     super.upload(element, update);
+
+    if (SYNC_MODE == "strict") {
+      this.callbacks.set(this.generation, onUploaded);
+    } else {
+      onUploaded();
+    }
+
+    this.generation++;
   }
 
   receive(data) {
     if (data.type != "work-started") {
+      return;
+    }
+    if (SYNC_MODE != "strict") {
       return;
     }
 

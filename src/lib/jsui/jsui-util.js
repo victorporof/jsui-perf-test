@@ -34,7 +34,31 @@ export const justOnceUntilNextFrame = fn => {
   };
 };
 
-export const justOnceWhenIdle = (fn, options = { timeout: 0 }) => {
+export const justOnceUntilIdle = (fn, options) => {
+  let pending;
+
+  return (...args) => {
+    if (!pending) {
+      pending = requestIdleCallback(() => (pending = null), options);
+      fn(...args);
+    }
+  };
+};
+
+export const justOnceDuringNextFrame = fn => {
+  let pending;
+
+  return (...args) => {
+    if (!pending) {
+      pending = requestAnimationFrame(() => {
+        pending = null;
+        fn(...args);
+      });
+    }
+  };
+};
+
+export const justOnceWhenIdle = (fn, options) => {
   let pending;
 
   return (...args) => {

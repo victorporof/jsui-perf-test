@@ -1,7 +1,5 @@
 import assert from "assert";
 
-import { stats } from "../../util/fps";
-
 export class Receiver {
   constructor(host) {
     this.opaqueShadowRoot = host.attachOpaqueShadow();
@@ -22,9 +20,6 @@ export class Receiver {
     if (data.type != "update") {
       return;
     }
-
-    stats.update();
-
     this.pending.push(data.payload);
     this.pending.sort((a, b) => a.generation - b.generation);
 
@@ -40,9 +35,14 @@ export class Receiver {
       this.generation++;
     }
 
-    if (update.changelist.length) {
-      this.post({ type: "work-started", payload: { generations } });
-      this.opaqueShadowRoot.render(update.changelist);
+    if (!update.changelist.length) {
+      return;
     }
+
+    if (SYNC_MODE == "strict") {
+      this.post({ type: "work-started", payload: { generations } });
+    }
+
+    this.opaqueShadowRoot.render(update.changelist);
   }
 }

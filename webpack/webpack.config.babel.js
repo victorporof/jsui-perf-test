@@ -3,6 +3,8 @@ import path from "path";
 import webpack from "webpack";
 
 const DEFAULT_LIB = "react";
+const DEFAULT_POLYFILL_MODE = "normal";
+const DEFAULT_SYNC_MODE = "normal";
 
 export default (env = {}) => ({
   devtool: "source-map",
@@ -30,7 +32,8 @@ export default (env = {}) => ({
   },
   plugins: [
     new webpack.DefinePlugin({
-      POLYFILL_MODE: `"${env.polyfill}"`,
+      POLYFILL_MODE: `"${env.polyfill ?? DEFAULT_POLYFILL_MODE}"`,
+      SYNC_MODE: `"${env.sync ?? DEFAULT_SYNC_MODE}"`
     })
   ],
   resolve: {
