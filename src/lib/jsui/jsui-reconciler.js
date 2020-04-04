@@ -1,3 +1,5 @@
+import assert from "assert";
+
 import { CHANGE_TYPE, PRIVATE_SUBTREE } from "../polyfill";
 
 import { gatherAttributes } from "./jsui-attributes";
@@ -130,7 +132,7 @@ export class BaseDiffingReconciler extends BaseReconciler {
   };
 }
 
-export class LocalDiffingReconciler extends BaseDiffingReconciler {
+export class LocalRenderer extends BaseDiffingReconciler {
   upload(element, update, onUploaded) {
     this.host.render(update.changelist);
     super.upload(element, update);
@@ -138,40 +140,72 @@ export class LocalDiffingReconciler extends BaseDiffingReconciler {
   }
 }
 
-export class RemoteDiffingReconciler extends BaseDiffingReconciler {
+export class RemoteRenderer extends BaseDiffingReconciler {
   constructor(host) {
     super(host);
 
     this.generation = 0;
     this.callbacks = new Map();
-    window.addEventListener("message", this.onMessage, false);
+    this.listen();
+  }
+
+  listen() {
+    assert.fail();
+  }
+
+  post(message) {
+    assert.fail();
   }
 
   upload(element, update, onUploaded) {
     this.callbacks.set(this.generation, onUploaded);
 
-    this.host.contentWindow.postMessage(
-      {
-        type: "update",
-        payload: {
-          generation: this.generation,
-          changelist: update.changelist
-        }
-      },
-      "*"
-    );
+    this.post({
+      type: "update",
+      payload: {
+        generation: this.generation,
+        changelist: update.changelist
+      }
+    });
 
     this.generation++;
     super.upload(element, update);
   }
 
-  onMessage = ({ data }) => {
+  receive(data) {
     if (data.type != "work-started") {
       return;
     }
+
     for (const generation of data.payload.generations) {
       this.callbacks.get(generation)();
       this.callbacks.delete(generation);
     }
-  };
+  }
+}
+
+export class RemoteIframeRenderer extends RemoteRenderer {
+  serialize = data => data;
+  deserialize = data => data;
+
+  listen() {
+    window.addEventListener("message", ({ data }) => this.receive(this.deserialize(data)), false);
+  }
+
+  post(data) {
+    this.host.contentWindow.postMessage(this.serialize(data), "*");
+  }
+}
+
+export class RemoteWebRTCRenderer extends RemoteRenderer {
+  serialize = JSON.stringify;
+  deserialize = JSON.parse;
+
+  listen() {
+    this.host.on("data", data => this.receive(this.deserialize(data)));
+  }
+
+  post(data) {
+    this.host.send(this.serialize(data));
+  }
 }

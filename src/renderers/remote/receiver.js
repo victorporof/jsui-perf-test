@@ -1,6 +1,8 @@
+import assert from "assert";
+
 import { stats } from "../../util/fps";
 
-export class Root {
+export class Receiver {
   constructor(host) {
     this.opaqueShadowRoot = host.attachOpaqueShadow();
 
@@ -9,10 +11,14 @@ export class Root {
   }
 
   listen() {
-    window.addEventListener("message", this.onMessage, false);
+    assert.fail();
   }
 
-  onMessage = ({ data }) => {
+  post(message) {
+    assert.fail();
+  }
+
+  receive(data) {
     if (data.type != "update") {
       return;
     }
@@ -35,8 +41,8 @@ export class Root {
     }
 
     if (update.changelist.length) {
-      parent.postMessage({ type: "work-started", payload: { generations } }, "*");
+      this.post({ type: "work-started", payload: { generations } });
       this.opaqueShadowRoot.render(update.changelist);
     }
-  };
+  }
 }
