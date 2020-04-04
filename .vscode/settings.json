@@ -1,5 +1,6 @@
 {
   "search.exclude": {
-    "js-repaint-perfs": true
+    "js-repaint-perfs": true,
+    "js-framework-benchmark": true
   }
 }

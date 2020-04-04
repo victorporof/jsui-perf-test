@@ -1,3 +1,6 @@
 [submodule "js-repaint-perfs"]
 	path = js-repaint-perfs
 	url = git@github.com:victorporof/js-repaint-perfs.git
+[submodule "js-framework-benchmark"]
+	path = js-framework-benchmark
+	url = git@github.com:krausest/js-framework-benchmark.git
