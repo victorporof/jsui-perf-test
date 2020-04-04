@@ -3,6 +3,7 @@ body {
 }
 
 .stats {
-  bottom: 48px !important;
-  margin-bottom: 1px;
+  left: 0px;
+  right: unset;
+  filter: hue-rotate(180deg);
 }
