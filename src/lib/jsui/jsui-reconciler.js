@@ -141,6 +141,9 @@ export class LocalRenderer extends BaseDiffingReconciler {
 }
 
 export class RemoteRenderer extends BaseDiffingReconciler {
+  serialize = TRANSPORT_SERIALIZE;
+  deserialize = TRANSPORT_DESERIALIZE;
+
   constructor(host) {
     super(host);
 
@@ -193,9 +196,6 @@ export class RemoteRenderer extends BaseDiffingReconciler {
 }
 
 export class RemoteIframeRenderer extends RemoteRenderer {
-  serialize = data => data;
-  deserialize = data => data;
-
   listen() {
     window.addEventListener("message", ({ data }) => this.receive(this.deserialize(data)), false);
   }
@@ -206,9 +206,6 @@ export class RemoteIframeRenderer extends RemoteRenderer {
 }
 
 export class RemoteWebRTCRenderer extends RemoteRenderer {
-  serialize = JSON.stringify;
-  deserialize = JSON.parse;
-
   listen() {
     this.host.on("data", data => this.receive(this.deserialize(data)));
   }

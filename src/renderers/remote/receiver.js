@@ -1,6 +1,9 @@
 import assert from "assert";
 
 export class Receiver {
+  serialize = TRANSPORT_SERIALIZE;
+  deserialize = TRANSPORT_DESERIALIZE;
+
   constructor(host) {
     this.opaqueShadowRoot = host.attachOpaqueShadow();
 

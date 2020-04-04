@@ -4,9 +4,6 @@ import { RECEIVER_ID } from "../../../lib/jsui/jsui-dom-webrtc";
 import { Receiver as BaseReceiver } from "../receiver";
 
 export class Receiver extends BaseReceiver {
-  serialize = JSON.stringify;
-  deserialize = JSON.parse;
-
   listen() {
     const peer = new Peer(RECEIVER_ID, {
       host: "localhost",

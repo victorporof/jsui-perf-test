@@ -5,6 +5,7 @@ import webpack from "webpack";
 const DEFAULT_LIB = "react";
 const DEFAULT_POLYFILL_MODE = "normal";
 const DEFAULT_SYNC_MODE = "normal";
+const DEFAULT_SERIALIZER = "json";
 
 export default (env = {}) => ({
   devtool: "source-map",
@@ -33,7 +34,17 @@ export default (env = {}) => ({
   plugins: [
     new webpack.DefinePlugin({
       POLYFILL_MODE: `"${env.polyfill ?? DEFAULT_POLYFILL_MODE}"`,
-      SYNC_MODE: `"${env.sync ?? DEFAULT_SYNC_MODE}"`
+      SYNC_MODE: `"${env.sync ?? DEFAULT_SYNC_MODE}"`,
+      ...{
+        identity: {
+          TRANSPORT_SERIALIZE: "v => v",
+          TRANSPORT_DESERIALIZE: "v => v"
+        },
+        json: {
+          TRANSPORT_SERIALIZE: "JSON.stringify",
+          TRANSPORT_DESERIALIZE: "JSON.parse"
+        }
+      }[env.serializer ?? DEFAULT_SERIALIZER]
     })
   ],
   resolve: {
