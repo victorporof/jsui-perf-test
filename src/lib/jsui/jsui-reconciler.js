@@ -1,3 +1,5 @@
+import assert from "assert";
+
 import { CHANGE_TYPE, PRIVATE_SUBTREE } from "../polyfill";
 
 import { gatherAttributes } from "./jsui-attributes";
@@ -5,6 +7,10 @@ import { DOMNode, TextLeaf } from "./jsui-primitive";
 import { DOMPrint, HTMLPrint } from "./jsui-printers";
 
 export class BaseReconciler {
+  constructor(host) {
+    this.host = host;
+  }
+
   begin() {
     this.changelist = [];
     this.mountlist = [];
@@ -18,7 +24,7 @@ export class BaseReconciler {
     };
   }
 
-  upload(element, host, update) {
+  upload(element, update) {
     for (const component of update.mountlist) {
       component.componentDidMount();
     }
@@ -30,27 +36,47 @@ export class BaseReconciler {
     }
   };
 
-  onAdded = (element, parentElement) => {};
-  onAddedText = (element, parentElement) => {};
-  onAddedNode = (element, parentElement) => {};
-  onRemoved = () => {};
-  onSetText = (element, textContent) => {};
-  onSetAttribute = (element, name, value) => {};
-  onRemovedAttribute = () => {};
+  onAdded = (element, parentElement) => {
+    // noop
+  };
+
+  onAddedText = (element, parentElement) => {
+    // noop
+  };
+
+  onAddedNode = (element, parentElement) => {
+    // noop
+  };
+
+  onRemoved = () => {
+    // noop
+  };
+
+  onSetText = (element, textContent) => {
+    // noop
+  };
+
+  onSetAttribute = (element, name, value) => {
+    // noop
+  };
+
+  onRemovedAttribute = () => {
+    // noop
+  };
 }
 
 export class DOMReplaceReconciler extends BaseReconciler {
-  upload(element, host, update, onUploaded) {
-    DOMPrint.printInto(element, host[PRIVATE_SUBTREE]);
-    super.upload(element, host, update);
+  upload(element, update, onUploaded) {
+    DOMPrint.printInto(element, this.host[PRIVATE_SUBTREE]);
+    super.upload(element, update);
     onUploaded?.();
   }
 }
 
 export class InnerHTMLReplaceReconciler extends BaseReconciler {
-  upload(element, host, update, onUploaded) {
-    HTMLPrint.printInto(element, host[PRIVATE_SUBTREE]);
-    super.upload(element, host, update);
+  upload(element, update, onUploaded) {
+    HTMLPrint.printInto(element, this.host[PRIVATE_SUBTREE]);
+    super.upload(element, update);
     onUploaded?.();
   }
 }
@@ -106,48 +132,85 @@ export class BaseDiffingReconciler extends BaseReconciler {
   };
 }
 
-export class LocalDiffingReconciler extends BaseDiffingReconciler {
-  upload(element, host, update, onUploaded) {
-    host.render(update.changelist);
-    super.upload(element, host, update);
+export class LocalRenderer extends BaseDiffingReconciler {
+  upload(element, update, onUploaded) {
+    this.host.render(update.changelist);
+    super.upload(element, update);
     onUploaded?.();
   }
 }
 
-export class RemoteDiffingReconciler extends BaseDiffingReconciler {
-  generation = 0;
-  callbacks = new Map();
+export class RemoteRenderer extends BaseDiffingReconciler {
+  serialize = TRANSPORT_SERIALIZE;
+  deserialize = TRANSPORT_DESERIALIZE;
 
-  constructor() {
-    super();
-    window.addEventListener("message", this.onMessage, false);
+  constructor(host) {
+    super(host);
+
+    this.generation = 0;
+    this.callbacks = new Map();
+    this.listen();
   }
 
-  upload(element, host, update, onUploaded) {
-    this.callbacks.set(this.generation, onUploaded);
+  listen() {
+    assert.fail();
+  }
 
-    host.contentWindow.postMessage(
-      {
-        type: "update",
-        payload: {
-          generation: this.generation,
-          changelist: update.changelist
-        }
-      },
-      "*"
-    );
+  post(message) {
+    assert.fail();
+  }
+
+  upload(element, update, onUploaded) {
+    this.post({
+      type: "update",
+      payload: {
+        generation: this.generation,
+        changelist: update.changelist
+      }
+    });
+
+    super.upload(element, update);
+
+    if (SYNC_MODE == "strict") {
+      this.callbacks.set(this.generation, onUploaded);
+    } else {
+      onUploaded();
+    }
 
     this.generation++;
-    super.upload(element, host, update);
   }
 
-  onMessage = ({ data }) => {
+  receive(data) {
     if (data.type != "work-started") {
       return;
     }
+    if (SYNC_MODE != "strict") {
+      return;
+    }
+
     for (const generation of data.payload.generations) {
       this.callbacks.get(generation)();
       this.callbacks.delete(generation);
     }
-  };
+  }
+}
+
+export class RemoteIframeRenderer extends RemoteRenderer {
+  listen() {
+    window.addEventListener("message", ({ data }) => this.receive(this.deserialize(data)), false);
+  }
+
+  post(data) {
+    this.host.contentWindow.postMessage(this.serialize(data), "*");
+  }
+}
+
+export class RemoteWebRTCRenderer extends RemoteRenderer {
+  listen() {
+    this.host.on("data", data => this.receive(this.deserialize(data)));
+  }
+
+  post(data) {
+    this.host.send(this.serialize(data));
+  }
 }

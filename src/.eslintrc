@@ -2,5 +2,11 @@
   "env": {
     "browser": true,
     "node": false
+  },
+  "globals": {
+    "POLYFILL_MODE": true,
+    "SYNC_MODE": true,
+    "TRANSPORT_SERIALIZE": true,
+    "TRANSPORT_DESERIALIZE": true
   }
 }

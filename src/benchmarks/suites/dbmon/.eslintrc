@@ -1,0 +1,8 @@
+{
+  "globals": {
+    "TABLE_COUNT": true
+  },
+  "settings": {
+    "import/core-modules": ["content.css", "layout.css", "containment.css"]
+  }
+}

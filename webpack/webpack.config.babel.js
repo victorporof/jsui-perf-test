@@ -2,7 +2,10 @@ import path from "path";
 
 import webpack from "webpack";
 
-const DEFAULT_LIB = "react";
+const DEFAULT_LIB = "react"; // react | preact | jsui | jsui-iframe | jsui-webrtc
+const DEFAULT_POLYFILL_MODE = "normal"; // normal | force
+const DEFAULT_SYNC_MODE = "normal"; // normal | strict
+const DEFAULT_SERIALIZER = "identity"; // identity | json
 
 export default (env = {}) => ({
   devtool: "source-map",
@@ -18,19 +21,30 @@ export default (env = {}) => ({
         use: [{ loader: "html-loader" }]
       },
       {
-        test: /\.raw\.css$/,
+        test: /\.css$/,
+        exclude: /\.global\.css$/,
         use: [{ loader: "to-string-loader" }, { loader: "css-loader" }]
       },
       {
-        test: /\.css$/,
-        exclude: /\.raw\.css$/,
+        test: /\.global\.css$/,
         use: [{ loader: "style-loader" }, { loader: "css-loader" }]
       }
     ]
   },
   plugins: [
     new webpack.DefinePlugin({
-      POLYFILL: `"${env.polyfill}"`
+      POLYFILL_MODE: `"${env.polyfill ?? DEFAULT_POLYFILL_MODE}"`,
+      SYNC_MODE: `"${env.sync ?? DEFAULT_SYNC_MODE}"`,
+      ...{
+        identity: {
+          TRANSPORT_SERIALIZE: "v => v",
+          TRANSPORT_DESERIALIZE: "v => v"
+        },
+        json: {
+          TRANSPORT_SERIALIZE: "JSON.stringify",
+          TRANSPORT_DESERIALIZE: "JSON.parse"
+        }
+      }[env.serializer ?? DEFAULT_SERIALIZER]
     })
   ],
   resolve: {
@@ -49,9 +63,30 @@ export default (env = {}) => ({
           react: path.resolve(__dirname, "../src/lib/jsui/index.js"),
           "react-dom": path.resolve(__dirname, "../src/lib/jsui/jsui-dom.js")
         },
-        "jsui-remote": {
+        "jsui-iframe": {
           react: path.resolve(__dirname, "../src/lib/jsui/index.js"),
-          "react-dom": path.resolve(__dirname, "../src/lib/jsui/jsui-dom-remote.js")
+          "react-dom": path.resolve(__dirname, "../src/lib/jsui/jsui-dom-iframe.js")
+        },
+        "jsui-webrtc": {
+          react: path.resolve(__dirname, "../src/lib/jsui/index.js"),
+          "react-dom": path.resolve(__dirname, "../src/lib/jsui/jsui-dom-webrtc.js")
+        }
+      }[env.lib ?? DEFAULT_LIB],
+      ...{
+        react: {
+          "containment.css": path.resolve(__dirname, "../src/benchmarks/containment.local.css")
+        },
+        preact: {
+          "containment.css": path.resolve(__dirname, "../src/benchmarks/containment.local.css")
+        },
+        jsui: {
+          "containment.css": path.resolve(__dirname, "../src/benchmarks/containment.local.css")
+        },
+        "jsui-iframe": {
+          "containment.css": path.resolve(__dirname, "../src/benchmarks/containment.remote.css")
+        },
+        "jsui-webrtc": {
+          "containment.css": path.resolve(__dirname, "../src/benchmarks/containment.remote.css")
         }
       }[env.lib ?? DEFAULT_LIB]
     }

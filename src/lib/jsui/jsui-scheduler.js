@@ -1,3 +1,5 @@
+import assert from "assert";
+
 export class Scheduler {
   constructor(root) {
     this.root = root;
@@ -10,6 +12,7 @@ export class Scheduler {
     requestAnimationFrame(this.onAnimationFrame);
 
     if (this.rendering) {
+      assert(SYNC_MODE == "strict");
       return;
     }
 
