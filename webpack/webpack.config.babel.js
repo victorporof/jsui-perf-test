@@ -71,23 +71,6 @@ export default (env = {}) => ({
           "react-dom": path.resolve(__dirname, "../src/lib/jsui/jsui-dom-webrtc.js"),
         },
       }[env.lib ?? DEFAULT_LIB],
-      ...{
-        react: {
-          "containment.css": path.resolve(__dirname, "../src/benchmarks/containment.local.css"),
-        },
-        preact: {
-          "containment.css": path.resolve(__dirname, "../src/benchmarks/containment.local.css"),
-        },
-        jsui: {
-          "containment.css": path.resolve(__dirname, "../src/benchmarks/containment.local.css"),
-        },
-        "jsui-iframe": {
-          "containment.css": path.resolve(__dirname, "../src/benchmarks/containment.remote.css"),
-        },
-        "jsui-webrtc": {
-          "containment.css": path.resolve(__dirname, "../src/benchmarks/containment.remote.css"),
-        },
-      }[env.lib ?? DEFAULT_LIB],
     },
   },
   devServer: {

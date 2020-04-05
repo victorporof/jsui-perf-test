@@ -3,6 +3,6 @@
     "react/prop-types": "off"
   },
   "settings": {
-    "import/core-modules": ["benchmark", "containment.css"]
+    "import/core-modules": ["benchmark"]
   }
 }
