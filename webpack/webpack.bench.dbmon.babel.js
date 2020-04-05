@@ -61,7 +61,4 @@ export default (env = {}) =>
         }[env.layout ?? DEFAULT_LAYOUT_CSS],
       },
     },
-    devServer: {
-      disableHostCheck: true,
-    },
   });

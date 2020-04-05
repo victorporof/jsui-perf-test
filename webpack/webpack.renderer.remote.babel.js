@@ -30,6 +30,5 @@ export default (env = {}) =>
     devServer: {
       host: "jsui-server.local",
       port: 3000,
-      disableHostCheck: true,
     },
   });

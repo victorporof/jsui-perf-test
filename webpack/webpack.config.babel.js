@@ -90,4 +90,7 @@ export default (env = {}) => ({
       }[env.lib ?? DEFAULT_LIB],
     },
   },
+  devServer: {
+    disableHostCheck: true,
+  },
 });
