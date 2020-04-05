@@ -53,11 +53,11 @@ export default (env = {}) => ({
       ...{
         react: {
           react: "react",
-          "react-dom": path.resolve(__dirname, "../src/lib/compat/react-dom.js"),
+          "react-dom": "react-dom",
         },
         preact: {
           react: "preact/compat",
-          "react-dom": path.resolve(__dirname, "../src/lib/compat/preact-dom.js"),
+          "react-dom": "preact/compat",
         },
         jsui: {
           react: path.resolve(__dirname, "../src/lib/jsui/index.js"),
