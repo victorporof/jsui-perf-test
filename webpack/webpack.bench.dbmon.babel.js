@@ -8,7 +8,7 @@ import config from "./webpack.config.babel";
 
 const SUITES = path.join(__dirname, "../src/benchmarks/suites");
 
-const DEFAULT_BENCH = "react-basic"; // react-basic | react-scu
+const DEFAULT_IMPLEMENTATION = "react-basic"; // react-basic | react-scu
 const DEFAULT_LAYOUT_CSS = "block+flex"; // block | flex | block+flex | table
 const DEFAULT_TABLE_COUNT = 2;
 
@@ -40,7 +40,7 @@ export default (env = {}) =>
           "react-scu": {
             benchmark: path.resolve(SUITES, "dbmon/react-scu"),
           },
-        }[env.bench ?? DEFAULT_BENCH],
+        }[env.implementation ?? DEFAULT_IMPLEMENTATION],
         ...{
           block: {
             "content.css": path.resolve(SUITES, "dbmon/css/content.css"),
