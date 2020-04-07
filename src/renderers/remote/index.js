@@ -1,6 +1,6 @@
 import { Receiver } from "receiver";
 
-import { stats } from "../../util/fps";
+import { Stats } from "../../util/stats";
 
 import "./index.global.css";
 
@@ -10,9 +10,6 @@ const wrapper = document.getElementById("shadow-host");
 const receiver = new Receiver(wrapper);
 receiver.listen();
 
-const animate = () => {
-  stats.update();
-  requestAnimationFrame(animate);
-};
-
-requestAnimationFrame(animate);
+const stats = Stats.main();
+stats.appendIntoBody();
+stats.trackAnimationFrame();
