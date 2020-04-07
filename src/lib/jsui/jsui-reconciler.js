@@ -20,7 +20,7 @@ export class BaseReconciler {
   end() {
     return {
       changelist: this.changelist,
-      mountlist: this.mountlist
+      mountlist: this.mountlist,
     };
   }
 
@@ -30,7 +30,7 @@ export class BaseReconciler {
     }
   }
 
-  onInstantiated = element => {
+  onInstantiated = (element) => {
     if (element.isUserComponent()) {
       this.mountlist.push(element.component);
     }
@@ -165,8 +165,8 @@ export class RemoteRenderer extends BaseDiffingReconciler {
       type: "update",
       payload: {
         generation: this.generation,
-        changelist: update.changelist
-      }
+        changelist: update.changelist,
+      },
     });
 
     super.upload(element, update);
@@ -207,7 +207,7 @@ export class RemoteIframeRenderer extends RemoteRenderer {
 
 export class RemoteWebRTCRenderer extends RemoteRenderer {
   listen() {
-    this.host.on("data", data => this.receive(this.deserialize(data)));
+    this.host.on("data", (data) => this.receive(this.deserialize(data)));
   }
 
   post(data) {

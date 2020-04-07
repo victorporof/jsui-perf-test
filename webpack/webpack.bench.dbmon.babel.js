@@ -19,49 +19,49 @@ export default (env = {}) =>
       rules: [
         {
           test: path.resolve(__dirname, "../js-repaint-perfs/ENV.js"),
-          use: [{ loader: "exports-loader", options: { ENV: true } }]
-        }
-      ]
+          use: [{ loader: "exports-loader", options: { ENV: true } }],
+        },
+      ],
     },
     plugins: [
       new HtmlWebPackPlugin({
-        template: "./src/benchmarks/index.html"
+        template: "./src/benchmarks/index.html",
       }),
       new webpack.DefinePlugin({
-        TABLE_COUNT: `${env.tableCount ?? DEFAULT_TABLE_COUNT}`
-      })
+        TABLE_COUNT: `${env.tableCount ?? DEFAULT_TABLE_COUNT}`,
+      }),
     ],
     resolve: {
       alias: {
         ...{
           "react-basic": {
-            benchmark: path.resolve(SUITES, "dbmon/react-basic")
+            benchmark: path.resolve(SUITES, "dbmon/react-basic"),
           },
           "react-scu": {
-            benchmark: path.resolve(SUITES, "dbmon/react-scu")
-          }
+            benchmark: path.resolve(SUITES, "dbmon/react-scu"),
+          },
         }[env.bench ?? DEFAULT_BENCH],
         ...{
           block: {
             "content.css": path.resolve(SUITES, "dbmon/css/content.css"),
-            "layout.css": path.resolve(SUITES, "dbmon/css/layout-block.css")
+            "layout.css": path.resolve(SUITES, "dbmon/css/layout-block.css"),
           },
           flex: {
             "content.css": path.resolve(SUITES, "dbmon/css/content.css"),
-            "layout.css": path.resolve(SUITES, "dbmon/css/layout-flex.css")
+            "layout.css": path.resolve(SUITES, "dbmon/css/layout-flex.css"),
           },
           "block+flex": {
             "content.css": path.resolve(SUITES, "dbmon/css/content.css"),
-            "layout.css": path.resolve(SUITES, "dbmon/css/layout-block+flex.css")
+            "layout.css": path.resolve(SUITES, "dbmon/css/layout-block+flex.css"),
           },
           table: {
             "content.css": path.resolve(SUITES, "dbmon/css/content.css"),
-            "layout.css": path.resolve(SUITES, "dbmon/css/layout-table.css")
-          }
-        }[env.layout ?? DEFAULT_LAYOUT_CSS]
-      }
+            "layout.css": path.resolve(SUITES, "dbmon/css/layout-table.css"),
+          },
+        }[env.layout ?? DEFAULT_LAYOUT_CSS],
+      },
     },
     devServer: {
-      disableHostCheck: true
-    }
+      disableHostCheck: true,
+    },
   });

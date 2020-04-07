@@ -4,7 +4,7 @@ export const CHANGE_TYPE = {
   APPEND: "Append",
   REMOVE: "Remove",
   SET_ATTRIBUTE: "SetAttribute",
-  SET_TEXT_CONTENT: "SetTextContent"
+  SET_TEXT_CONTENT: "SetTextContent",
 };
 
 export const PRIVATE_SUBTREE = Symbol("OpaqueShadowRoot Private Subtree");

@@ -10,7 +10,7 @@ export default class JsUIDOM {
   static render(element, host, cb = () => {}) {
     const peer = new Peer(SENDER_ID, {
       host: "localhost",
-      port: 9000
+      port: 9000,
     });
 
     const conn = peer.connect(RECEIVER_ID);

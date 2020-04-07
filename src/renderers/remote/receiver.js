@@ -28,7 +28,7 @@ export class Receiver {
 
     const generations = [];
     const update = {
-      changelist: []
+      changelist: [],
     };
 
     while (this.pending[0]?.generation == this.generation) {

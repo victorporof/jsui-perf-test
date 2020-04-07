@@ -22,7 +22,7 @@ export class Root extends EventEmitter {
   uploadNextUpdate(onWillUpload, onUploaded, onSkipped = onWillUpload) {
     const update = {
       changelist: [],
-      mountlist: []
+      mountlist: [],
     };
 
     while (this.pending[0]) {

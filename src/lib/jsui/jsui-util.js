@@ -1,4 +1,4 @@
-export const oncePerAnimationFrame = fn => {
+export const oncePerAnimationFrame = (fn) => {
   const pending = [];
   let waiting = false;
 
@@ -23,7 +23,7 @@ export const oncePerAnimationFrame = fn => {
   };
 };
 
-export const justOnceUntilNextFrame = fn => {
+export const justOnceUntilNextFrame = (fn) => {
   let pending;
 
   return (...args) => {
@@ -45,7 +45,7 @@ export const justOnceUntilIdle = (fn, options) => {
   };
 };
 
-export const justOnceDuringNextFrame = fn => {
+export const justOnceDuringNextFrame = (fn) => {
   let pending;
 
   return (...args) => {

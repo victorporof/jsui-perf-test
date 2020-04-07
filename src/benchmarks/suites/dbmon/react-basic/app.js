@@ -48,13 +48,13 @@ export default class DBMon extends Component {
     super(...args);
 
     this.state = {
-      databases: []
+      databases: [],
     };
   }
 
   loadSamples() {
     this.setState({
-      databases: ENV.generateData(true).toArray()
+      databases: ENV.generateData(true).toArray(),
     });
     requestAnimationFrame(() => this.loadSamples());
   }
@@ -65,7 +65,7 @@ export default class DBMon extends Component {
 
   render() {
     const databases = () =>
-      this.state.databases.map(database => (
+      this.state.databases.map((database) => (
         <Database
           key={database.dbname}
           lastMutationId={database.lastMutationId}
@@ -77,7 +77,7 @@ export default class DBMon extends Component {
 
     return (
       <div className="dbmon">
-        {times(TABLE_COUNT).map(i => (
+        {times(TABLE_COUNT).map((i) => (
           <div key={i} className="table table-striped latest-data">
             <div className="tbody">{databases()}</div>
           </div>

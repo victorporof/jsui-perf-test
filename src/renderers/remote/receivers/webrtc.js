@@ -7,14 +7,14 @@ export class Receiver extends BaseReceiver {
   listen() {
     const peer = new Peer(RECEIVER_ID, {
       host: "localhost",
-      port: 9000
+      port: 9000,
     });
 
-    peer.on("connection", conn => {
+    peer.on("connection", (conn) => {
       this.conn = conn;
 
       conn.on("open", () => {
-        conn.on("data", data => {
+        conn.on("data", (data) => {
           this.receive(this.deserialize(data));
         });
       });

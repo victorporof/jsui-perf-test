@@ -12,10 +12,11 @@
     "plugin:import/warnings",
     "prettier"
   ],
-  "plugins": ["react", "import"],
+  "plugins": ["react", "import", "prettier"],
   "rules": {
     "require-jsdoc": "off",
     "no-invalid-this": "off",
+    "prettier/prettier": "error",
     "import/no-extraneous-dependencies": [
       "error",
       {
@@ -26,5 +27,10 @@
     ],
     "sort-imports": ["error", { "ignoreDeclarationSort": true }],
     "import/order": ["error", { "newlines-between": "always", "alphabetize": { "order": "asc" } }]
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
   }
 }

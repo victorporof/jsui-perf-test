@@ -14,22 +14,22 @@ export default (env = {}) => ({
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
-        use: [{ loader: "babel-loader" }]
+        use: [{ loader: "babel-loader" }],
       },
       {
         test: /\.html$/,
-        use: [{ loader: "html-loader" }]
+        use: [{ loader: "html-loader" }],
       },
       {
         test: /\.css$/,
         exclude: /\.global\.css$/,
-        use: [{ loader: "to-string-loader" }, { loader: "css-loader" }]
+        use: [{ loader: "to-string-loader" }, { loader: "css-loader" }],
       },
       {
         test: /\.global\.css$/,
-        use: [{ loader: "style-loader" }, { loader: "css-loader" }]
-      }
-    ]
+        use: [{ loader: "style-loader" }, { loader: "css-loader" }],
+      },
+    ],
   },
   plugins: [
     new webpack.DefinePlugin({
@@ -38,14 +38,14 @@ export default (env = {}) => ({
       ...{
         identity: {
           TRANSPORT_SERIALIZE: "v => v",
-          TRANSPORT_DESERIALIZE: "v => v"
+          TRANSPORT_DESERIALIZE: "v => v",
         },
         json: {
           TRANSPORT_SERIALIZE: "JSON.stringify",
-          TRANSPORT_DESERIALIZE: "JSON.parse"
-        }
-      }[env.serializer ?? DEFAULT_SERIALIZER]
-    })
+          TRANSPORT_DESERIALIZE: "JSON.parse",
+        },
+      }[env.serializer ?? DEFAULT_SERIALIZER],
+    }),
   ],
   resolve: {
     extensions: [".js", ".jsx"],
@@ -53,42 +53,42 @@ export default (env = {}) => ({
       ...{
         react: {
           react: "react",
-          "react-dom": path.resolve(__dirname, "../src/lib/compat/react-dom.js")
+          "react-dom": path.resolve(__dirname, "../src/lib/compat/react-dom.js"),
         },
         preact: {
           react: "preact/compat",
-          "react-dom": path.resolve(__dirname, "../src/lib/compat/preact-dom.js")
+          "react-dom": path.resolve(__dirname, "../src/lib/compat/preact-dom.js"),
         },
         jsui: {
           react: path.resolve(__dirname, "../src/lib/jsui/index.js"),
-          "react-dom": path.resolve(__dirname, "../src/lib/jsui/jsui-dom.js")
+          "react-dom": path.resolve(__dirname, "../src/lib/jsui/jsui-dom.js"),
         },
         "jsui-iframe": {
           react: path.resolve(__dirname, "../src/lib/jsui/index.js"),
-          "react-dom": path.resolve(__dirname, "../src/lib/jsui/jsui-dom-iframe.js")
+          "react-dom": path.resolve(__dirname, "../src/lib/jsui/jsui-dom-iframe.js"),
         },
         "jsui-webrtc": {
           react: path.resolve(__dirname, "../src/lib/jsui/index.js"),
-          "react-dom": path.resolve(__dirname, "../src/lib/jsui/jsui-dom-webrtc.js")
-        }
+          "react-dom": path.resolve(__dirname, "../src/lib/jsui/jsui-dom-webrtc.js"),
+        },
       }[env.lib ?? DEFAULT_LIB],
       ...{
         react: {
-          "containment.css": path.resolve(__dirname, "../src/benchmarks/containment.local.css")
+          "containment.css": path.resolve(__dirname, "../src/benchmarks/containment.local.css"),
         },
         preact: {
-          "containment.css": path.resolve(__dirname, "../src/benchmarks/containment.local.css")
+          "containment.css": path.resolve(__dirname, "../src/benchmarks/containment.local.css"),
         },
         jsui: {
-          "containment.css": path.resolve(__dirname, "../src/benchmarks/containment.local.css")
+          "containment.css": path.resolve(__dirname, "../src/benchmarks/containment.local.css"),
         },
         "jsui-iframe": {
-          "containment.css": path.resolve(__dirname, "../src/benchmarks/containment.remote.css")
+          "containment.css": path.resolve(__dirname, "../src/benchmarks/containment.remote.css"),
         },
         "jsui-webrtc": {
-          "containment.css": path.resolve(__dirname, "../src/benchmarks/containment.remote.css")
-        }
-      }[env.lib ?? DEFAULT_LIB]
-    }
-  }
+          "containment.css": path.resolve(__dirname, "../src/benchmarks/containment.remote.css"),
+        },
+      }[env.lib ?? DEFAULT_LIB],
+    },
+  },
 });
