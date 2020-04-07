@@ -8,7 +8,6 @@ const DEFAULT_SYNC_MODE = "normal"; // normal | strict
 const DEFAULT_SERIALIZER = "identity"; // identity | json
 
 export default (env = {}) => ({
-  devtool: "source-map",
   module: {
     rules: [
       {
