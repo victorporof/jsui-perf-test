@@ -77,6 +77,7 @@ export default class DBMon extends Component {
 
     return (
       <div className="dbmon">
+        {this.props.children}
         {times(TABLE_COUNT).map((i) => (
           <div key={i} className="table table-striped latest-data">
             <div className="tbody">{databases()}</div>
