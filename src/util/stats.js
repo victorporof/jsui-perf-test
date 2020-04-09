@@ -13,15 +13,16 @@ export class Stats {
     this.custom = [];
   }
 
-  addCustomPanel(className, displayName, fgColor = "#ff8", bgColor = "#221") {
+  addCustomPanel(className, displayName, { maxRange = 1, fgColor = "#ff8", bgColor = "#221" }) {
     const panel = this.stats.addPanel(new RawStats.Panel(displayName, fgColor, bgColor));
     panel.dom.setAttribute("custom", true);
     panel.dom.className = className;
-    this.custom.push(panel);
+    this.custom.push([panel, maxRange]);
   }
 
-  updateCustomPanel(index, value, range) {
-    this.custom[index].update(value, range);
+  updateCustomPanel(index, value) {
+    const [panel, maxRange] = this.custom[index];
+    panel.update(value, maxRange);
   }
 
   static main = once(() => {

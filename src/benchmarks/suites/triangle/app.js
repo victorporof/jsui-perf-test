@@ -8,8 +8,9 @@ import { useInterval } from "../../util/hooks/useInterval";
 const UPDATE_INTERVAL = 1000;
 
 const stats = Stats.main();
-stats.addCustomPanel("behind-stats", "#QUEUE", "#f88", "#000");
-stats.addCustomPanel("ideal-stats", "%STALE", "#f88", "#000");
+stats.addCustomPanel("behind-stats", "# queued", { maxRange: 10 });
+stats.addCustomPanel("ideal-stats", "% stale", { maxRange: 100 });
+stats.addCustomPanel("latency-stats", "MS late", { maxRange: UPDATE_INTERVAL * 3 });
 
 const Dot = (props) => {
   // Arficially long execution time.
@@ -48,10 +49,12 @@ export const App = (props) => {
   const desiredUpdates = useRef(0);
   const actualUpdates = useRef(0);
   const missedUpdates = useRef(0);
+  const updateStartTimes = useRef([performance.now()]);
 
   useInterval(
     useCallback(() => {
       desiredUpdates.current++;
+      updateStartTimes.current.push(performance.now());
       setCount((count) => count + 1);
     }, []),
     UPDATE_INTERVAL
@@ -61,10 +64,16 @@ export const App = (props) => {
     const desired = desiredUpdates.current;
     const actual = actualUpdates.current;
     const missed = missedUpdates.current;
-    stats.updateCustomPanel(0, desired - actual, 10);
-    stats.updateCustomPanel(1, 100 - (actual / (desired + missed)) * 100 || 0, 100);
+    const startTimes = updateStartTimes.current;
+
+    const latency = Math.max(performance.now() - startTimes[0] - UPDATE_INTERVAL, 0);
+    stats.updateCustomPanel(0, desired - actual);
+    stats.updateCustomPanel(1, 100 - (actual / (desired + missed)) * 100 || 0);
+    stats.updateCustomPanel(2, latency);
+
     actualUpdates.current++;
     missedUpdates.current += desired - actual;
+    startTimes.shift();
   });
 
   return (
