@@ -1,0 +1,6 @@
+:host > div {
+  width: 100vw;
+  height: 100vh;
+  contain: strict;
+  overflow: auto;
+}

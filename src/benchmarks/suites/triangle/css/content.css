@@ -1,0 +1,44 @@
+@keyframes breathe {
+  0% {
+    width: 750px;
+    height: 700px;
+  }
+
+  100% {
+    width: 1500px;
+    height: 800px;
+  }
+}
+
+.app {
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+}
+
+.app > .sierpinski {
+  animation: breathe 5s alternate infinite linear;
+}
+
+.sierpinski {
+  width: 50%;
+  height: 50%;
+}
+
+.sierpinski > :first-child {
+  margin: 0 25%;
+}
+
+.dot {
+  width: 50%;
+  height: 50%;
+  font-family: sans-serif;
+  background: lavender;
+  color: indigo;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.dot.hovered {
+  background: yellow;
+}

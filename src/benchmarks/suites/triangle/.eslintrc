@@ -1,0 +1,8 @@
+{
+  "globals": {
+    "RECURSION": true
+  },
+  "settings": {
+    "import/core-modules": ["content.css", "layout.css", "containment.css"]
+  }
+}

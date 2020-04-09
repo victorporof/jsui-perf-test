@@ -1,0 +1,16 @@
+.app {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sierpinski {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

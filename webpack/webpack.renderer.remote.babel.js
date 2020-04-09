@@ -7,8 +7,8 @@ import config from "./webpack.config.babel";
 
 const DEFAULT_PIPE = "postmessage"; // postmessage | webrtc
 
-export default (env = {}) =>
-  merge(config(env), {
+export default (env = {}, argv = {}) =>
+  merge(config(env, argv), {
     entry: "./src/renderers/remote/index.js",
     plugins: [
       new HtmlWebPackPlugin({
@@ -30,6 +30,5 @@ export default (env = {}) =>
     devServer: {
       host: "jsui-server.local",
       port: 3000,
-      disableHostCheck: true,
     },
   });

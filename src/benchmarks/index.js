@@ -1,4 +1,9 @@
 import "benchmark";
 
 import "../lib/polyfill";
-import "../util/fps";
+
+import { Stats } from "../util/stats";
+
+const stats = Stats.main();
+stats.appendIntoBody();
+stats.trackAnimationFrame();

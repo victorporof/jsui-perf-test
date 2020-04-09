@@ -7,8 +7,7 @@ const DEFAULT_POLYFILL_MODE = "normal"; // normal | force
 const DEFAULT_SYNC_MODE = "normal"; // normal | strict
 const DEFAULT_SERIALIZER = "identity"; // identity | json
 
-export default (env = {}) => ({
-  devtool: "source-map",
+export default (env = {}, argv = {}) => ({
   module: {
     rules: [
       {
@@ -52,12 +51,16 @@ export default (env = {}) => ({
     alias: {
       ...{
         react: {
+          react: `react-15/dist/react${argv.mode == "development" ? "" : ".min"}`,
+          "react-dom": `react-dom-core/dist/react-dom${argv.mode == "development" ? "" : ".min"}`,
+        },
+        "react-experimental": {
           react: "react",
-          "react-dom": path.resolve(__dirname, "../src/lib/compat/react-dom.js"),
+          "react-dom": "react-dom",
         },
         preact: {
           react: "preact/compat",
-          "react-dom": path.resolve(__dirname, "../src/lib/compat/preact-dom.js"),
+          "react-dom": "preact/compat",
         },
         jsui: {
           react: path.resolve(__dirname, "../src/lib/jsui/index.js"),
@@ -72,23 +75,13 @@ export default (env = {}) => ({
           "react-dom": path.resolve(__dirname, "../src/lib/jsui/jsui-dom-webrtc.js"),
         },
       }[env.lib ?? DEFAULT_LIB],
-      ...{
-        react: {
-          "containment.css": path.resolve(__dirname, "../src/benchmarks/containment.local.css"),
-        },
-        preact: {
-          "containment.css": path.resolve(__dirname, "../src/benchmarks/containment.local.css"),
-        },
-        jsui: {
-          "containment.css": path.resolve(__dirname, "../src/benchmarks/containment.local.css"),
-        },
-        "jsui-iframe": {
-          "containment.css": path.resolve(__dirname, "../src/benchmarks/containment.remote.css"),
-        },
-        "jsui-webrtc": {
-          "containment.css": path.resolve(__dirname, "../src/benchmarks/containment.remote.css"),
-        },
-      }[env.lib ?? DEFAULT_LIB],
+    },
+  },
+  devServer: {
+    disableHostCheck: true,
+    headers: {
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Cross-Origin-Embedder-Policy": "require-corp",
     },
   },
 });
