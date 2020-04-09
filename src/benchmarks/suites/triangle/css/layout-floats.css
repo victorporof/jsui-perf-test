@@ -1,0 +1,19 @@
+.app > .sierpinski {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.sierpinski,
+.dot {
+  float: left;
+}
+
+.sierpinski > :nth-child(2) {
+  clear: left;
+}
+
+.dot {
+  text-align: center;
+}

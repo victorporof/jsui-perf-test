@@ -13,8 +13,8 @@ const DEFAULT_IMPLEMENTATION = "react-basic"; // react-basic | react-scu
 const DEFAULT_LAYOUT_CSS = "block+flex"; // block | flex | block+flex | table
 const DEFAULT_TABLE_COUNT = 2;
 
-export default (env = {}) =>
-  merge(config(env), {
+export default (env = {}, argv = {}) =>
+  merge(config(env, argv), {
     entry: "./src/benchmarks/index.js",
     module: {
       rules: [
@@ -44,6 +44,9 @@ export default (env = {}) =>
         }[env.implementation ?? DEFAULT_IMPLEMENTATION],
         ...{
           react: {
+            "containment.css": path.resolve(DBMON, "css/containment.local.css"),
+          },
+          "react-experimental": {
             "containment.css": path.resolve(DBMON, "css/containment.local.css"),
           },
           preact: {

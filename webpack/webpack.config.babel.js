@@ -7,7 +7,7 @@ const DEFAULT_POLYFILL_MODE = "normal"; // normal | force
 const DEFAULT_SYNC_MODE = "normal"; // normal | strict
 const DEFAULT_SERIALIZER = "identity"; // identity | json
 
-export default (env = {}) => ({
+export default (env = {}, argv = {}) => ({
   module: {
     rules: [
       {
@@ -51,6 +51,10 @@ export default (env = {}) => ({
     alias: {
       ...{
         react: {
+          react: `react-15/dist/react${argv.mode == "development" ? "" : ".min"}`,
+          "react-dom": `react-dom-core/dist/react-dom${argv.mode == "development" ? "" : ".min"}`,
+        },
+        "react-experimental": {
           react: "react",
           "react-dom": "react-dom",
         },
@@ -75,5 +79,9 @@ export default (env = {}) => ({
   },
   devServer: {
     disableHostCheck: true,
+    headers: {
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Cross-Origin-Embedder-Policy": "require-corp",
+    },
   },
 });
