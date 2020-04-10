@@ -3,9 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { Stats } from "../../../util/stats";
 import { useInterval } from "../../util/hooks/useInterval";
-// import { useWait } from "../../util/hooks/useWait";
-
-const UPDATE_INTERVAL = 1000;
+import { useWait } from "../../util/hooks/useWait";
 
 const stats = Stats.main();
 stats.addCustomPanel("behind-stats", "# queued", { maxRange: 10 });
@@ -14,7 +12,7 @@ stats.addCustomPanel("latency-stats", "MS late", { maxRange: UPDATE_INTERVAL * 3
 
 const Dot = (props) => {
   // Arficially long execution time.
-  // useWait(1);
+  useWait(BLOCKING_TIME);
 
   const [hover, setHover] = useState(false);
   const count = props.count % 10;

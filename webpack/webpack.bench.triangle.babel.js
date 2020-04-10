@@ -10,6 +10,8 @@ const TRIANGLE = path.join(__dirname, "../src/benchmarks/suites/triangle");
 
 const DEFAULT_LAYOUT_CSS = "flex"; // floats | flex
 const DEFAULT_RECURSION = 7;
+const DEFAULT_UPDATE_INTERVAL = 1000;
+const DEFAULT_BLOCKING_TIME = 1;
 
 export default (env = {}, argv = {}) =>
   merge(config(env, argv), {
@@ -20,6 +22,8 @@ export default (env = {}, argv = {}) =>
       }),
       new webpack.DefinePlugin({
         RECURSION: `${env.recursion ?? DEFAULT_RECURSION}`,
+        UPDATE_INTERVAL: `${env.updateInterval ?? DEFAULT_UPDATE_INTERVAL}`,
+        BLOCKING_TIME: `${env.blockingTime ?? DEFAULT_BLOCKING_TIME}`,
       }),
     ],
     resolve: {
