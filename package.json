@@ -75,7 +75,7 @@
     "peer": "^0.5.2",
     "peerjs": "^1.2.0",
     "preact": "^10.3.4",
-    "react": "^0.0.0-experimental-d7382b6c4",
+    "react": "^0.14.0",
     "react-15": "^0.2.0",
     "react-dom": "^0.0.0-experimental-d7382b6c4",
     "react-dom-core": "^0.1.1",
